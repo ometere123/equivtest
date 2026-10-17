@@ -144,6 +144,66 @@ def test_consequential_pass_and_duplicate_guards(runtime):
         c.close_run(run)
 
 
+def test_duplicate_registration_is_idempotent_and_version_drift_is_rejected(runtime):
+    c, _, _, gl, targets = prepared(runtime)
+    assert c.register_target("0x" + "2" * 40, "Same target") == "T-1"
+    assert c.target_count == 1
+    targets["0x" + "2" * 40].get_equivtest_manifest = lambda: json.dumps({
+        "schema": "equivtest.case/1", "version": "fixture-milestone-2"
+    })
+    with pytest.raises(ValueError, match="another version"):
+        c.register_target("0x" + "2" * 40, "Changed target")
+    assert c.target_count == 1
+
+
+def test_capture_rechecks_declared_target_version(runtime):
+    c, suite, case, gl, targets = prepared(runtime)
+    c.freeze_suite(suite)
+    run = c.open_run(suite)
+    targets["0x" + "2" * 40].get_equivtest_manifest = lambda: json.dumps({
+        "schema": "equivtest.case/1", "version": "fixture-milestone-2"
+    })
+    with pytest.raises(ValueError, match="Target version mismatch"):
+        c.capture_case(run, case, "version-drift")
+    assert c.get_snapshot(run, case) == ""
+
+
+def test_evaluation_rejects_cross_bound_snapshot(runtime):
+    c, suite, case, gl, _ = prepared(runtime)
+    c.freeze_suite(suite)
+    run = c.open_run(suite)
+    c.capture_case(run, case, "bound-observation")
+    location = run + "/" + case
+    snapshot = json.loads(c.snapshots[location])
+    snapshot["suite_id"] = "S-999"
+    c.snapshots[location] = json.dumps(snapshot, sort_keys=True, separators=(",", ":"))
+    with pytest.raises(ValueError, match="Snapshot binding mismatch"):
+        c.evaluate_case(run, case)
+    assert c.get_verdict(run, case) == ""
+
+
+def test_same_target_observation_cannot_be_reused_by_a_recheck(runtime):
+    c, suite, case, gl, _ = prepared(runtime)
+    c.freeze_suite(suite)
+    first = c.open_run(suite)
+    c.capture_case(first, case, "immutable-observation")
+    assert c.evaluate_case(first, case) == "PASS"
+    assert c.close_run(first) == "PASS"
+    second = c.open_recheck(first)
+    with pytest.raises(ValueError, match="Observation already captured"):
+        c.capture_case(second, case, "immutable-observation")
+
+
+def test_external_json_decode_failures_are_recoverable(runtime):
+    c, suite, case, gl, targets = prepared(runtime)
+    c.freeze_suite(suite)
+    run = c.open_run(suite)
+    targets["0x" + "2" * 40].get_equivtest_case = lambda observation: "not-json"
+    with pytest.raises(ValueError, match="Malformed observation"):
+        c.capture_case(run, case, "malformed")
+    assert c.get_snapshot(run, case) == ""
+
+
 def test_semantic_contradiction_not_shape_only(runtime):
     c, suite, case, gl, targets = prepared(runtime)
     def bad_case(observation):

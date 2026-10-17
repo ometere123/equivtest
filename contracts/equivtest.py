@@ -12,6 +12,14 @@ def decoded(value):
     return json.loads(value)
 
 
+def decoded_external(value, label):
+    """Decode untrusted adapter/model JSON as a recoverable contract error."""
+    try:
+        return json.loads(value)
+    except Exception:
+        raise gl.vm.UserError("Malformed " + label)
+
+
 def digest(value):
     return hashlib.sha256(encoded(value).encode("utf-8")).hexdigest()
 
@@ -42,6 +50,7 @@ def clean_verdict(data):
     require(reason in ("MEETS_REQUIREMENT", "RULE_CONTRADICTION", "INSUFFICIENT_EVIDENCE", "AMBIGUOUS_REQUIREMENT"), "Invalid reason")
     require(isinstance(failed, list) and len(failed) <= 8, "Invalid criterion refs")
     require(isinstance(refs, list) and len(refs) <= 8, "Invalid evidence refs")
+    require(len(refs) > 0, "Missing evidence refs")
     require(all(isinstance(x, str) and 0 < len(x) <= 64 for x in failed), "Invalid criterion")
     require(all(isinstance(x, str) and 0 < len(x) <= 64 for x in refs), "Invalid evidence")
     require(isinstance(summary, str) and 0 < len(summary) <= 480, "Invalid summary")
@@ -69,6 +78,8 @@ class EquivTest(gl.Contract):
     suite_count: u64
     case_count: u64
     run_count: u64
+    target_by_address: TreeMap[str, str]
+    captured_observations: TreeMap[str, str]
 
     def __init__(self):
         self.targets = TreeMap()
@@ -81,6 +92,8 @@ class EquivTest(gl.Contract):
         self.suite_count = u64(0)
         self.case_count = u64(0)
         self.run_count = u64(0)
+        self.target_by_address = TreeMap()
+        self.captured_observations = TreeMap()
 
     @gl.public.write
     def register_target(self, target_address: Address, label: str) -> str:
@@ -88,16 +101,23 @@ class EquivTest(gl.Contract):
         # The public adapter is called on chain. The registrant is not assumed to own the target.
         raw = gl.get_contract_at(target_address).view().get_equivtest_manifest()
         require(isinstance(raw, str) and len(raw) <= 2048, "Invalid target adapter")
-        manifest = decoded(raw)
+        manifest = decoded_external(raw, "target manifest")
         require(isinstance(manifest, dict) and manifest.get("schema") == "equivtest.case/1", "Unsupported adapter schema")
         version = text_limit(manifest.get("version"), 64, "version")
+        address = str(target_address)
+        existing_id = self.target_by_address.get(address, "")
+        if existing_id:
+            existing = decoded(self.targets[existing_id])
+            require(existing["version"] == version, "Target already registered with another version")
+            return existing_id
         self.target_count += u64(1)
         ident = key("T", self.target_count)
         self.targets[ident] = encoded({
-            "id": ident, "address": str(target_address), "label": label,
+            "id": ident, "address": address, "label": label,
             "version": version, "schema": "equivtest.case/1",
             "registrant": str(gl.message.sender_address)
         })
+        self.target_by_address[address] = ident
         return ident
 
     @gl.public.write
@@ -108,7 +128,7 @@ class EquivTest(gl.Contract):
         require(len(supersedes) <= 24, "Invalid parent")
         if supersedes:
             old = self.suites.get(supersedes, "")
-            require(bool(old) and decoded(old)["target_id"] == target_id, "Invalid parent suite")
+            require(bool(old) and decoded(old)["target_id"] == target_id and decoded(old)["frozen"], "Invalid parent suite")
         self.suite_count += u64(1)
         ident = key("S", self.suite_count)
         self.suites[ident] = encoded({
@@ -202,9 +222,21 @@ class EquivTest(gl.Contract):
         require(not self.snapshots.get(location, ""), "Case already captured")
         observation_id = text_limit(observation_id, 80, "observation id")
         target = decoded(self.targets[run["target_id"]])
+        require(suite["frozen"] and suite["digest"] == run["suite_digest"], "Suite digest mismatch")
+        manifest_raw = gl.get_contract_at(Address(target["address"])).view().get_equivtest_manifest()
+        require(isinstance(manifest_raw, str) and len(manifest_raw) <= 2048, "Invalid target adapter")
+        manifest = decoded_external(manifest_raw, "target manifest")
+        require(
+            isinstance(manifest, dict)
+            and manifest.get("schema") == target["schema"]
+            and manifest.get("version") == target["version"],
+            "Target version mismatch",
+        )
+        observation_key = target["address"] + "/" + observation_id
+        require(not self.captured_observations.get(observation_key, ""), "Observation already captured")
         response = gl.get_contract_at(Address(target["address"])).view().get_equivtest_case(observation_id)
         require(isinstance(response, str) and 0 < len(response) <= 6000, "Invalid observation")
-        evidence = decoded(response)
+        evidence = decoded_external(response, "observation")
         require(isinstance(evidence, dict), "Malformed observation")
         require(evidence.get("schema") == "equivtest.case/1", "Observation schema mismatch")
         require(evidence.get("observation_id") == observation_id, "Observation id mismatch")
@@ -213,6 +245,7 @@ class EquivTest(gl.Contract):
         require(isinstance(evidence.get("state"), dict), "State must be an object")
         snapshot = {
             "run_id": run_id, "case_id": case_id,
+            "suite_id": run["suite_id"], "target_id": run["target_id"],
             "observation_id": observation_id, "target_address": target["address"],
             "target_version": target["version"], "suite_digest": suite["digest"],
             "evidence": evidence, "evidence_digest": digest(evidence),
@@ -221,6 +254,7 @@ class EquivTest(gl.Contract):
         }
         require(len(encoded(snapshot)) <= 7500, "Snapshot too large")
         self.snapshots[location] = encoded(snapshot)
+        self.captured_observations[observation_key] = "1"
         return snapshot["evidence_digest"]
 
     @gl.public.write
@@ -236,8 +270,16 @@ class EquivTest(gl.Contract):
         snap_raw = self.snapshots.get(location, "")
         require(bool(snap_raw), "Capture evidence before evaluation")
         snapshot = decoded(snap_raw)
+        target = decoded(self.targets[run["target_id"]])
+        require(snapshot["run_id"] == run_id and snapshot["case_id"] == case_id, "Snapshot binding mismatch")
+        require(snapshot["suite_id"] == run["suite_id"] and snapshot["target_id"] == run["target_id"], "Snapshot binding mismatch")
+        require(snapshot["target_address"] == target["address"] and snapshot["target_version"] == target["version"], "Snapshot target mismatch")
+        require(snapshot["suite_digest"] == suite["digest"] and snapshot["provenance"] == "TARGET_PUBLIC_VIEW", "Snapshot provenance mismatch")
         case = decoded(self.cases[case_id])
         payload = encoded({
+            "run_id": run_id, "case_id": case_id, "target_id": run["target_id"],
+            "target_address": target["address"], "target_version": target["version"],
+            "suite_digest": suite["digest"],
             "requirement": case["requirement"], "criteria": case["criteria"],
             "evidence": snapshot["evidence"], "evidence_digest": snapshot["evidence_digest"]
         })

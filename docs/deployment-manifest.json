@@ -1,0 +1,37 @@
+{
+  "status": "BLOCKED_BEFORE_DEPLOYMENT",
+  "observedAt": "2026-10-17",
+  "repository": "https://github.com/ometere123/equivtest",
+  "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
+  "network": {
+    "name": "GenLayer StudioNet",
+    "chainId": 61999,
+    "rpc": "https://studio.genlayer.com/api",
+    "explorer": "https://genlayer-explorer.vercel.app"
+  },
+  "toolchain": {
+    "genlayerCli": "0.39.1",
+    "genvmLinter": "0.11.0",
+    "genvmArtifact": "v0.2.12",
+    "genlayerJs": "1.1.8",
+    "genlayerTest": "0.29.2"
+  },
+  "intendedSources": {
+    "contracts/equivtest.py": {
+      "sha256": "FEEC8E28BE125C0FD3F83846935DA4B0DD64C1EBB6475988359A3ABDC11841FC"
+    },
+    "contracts/fixture_milestone.py": {
+      "sha256": "10EFE6FD25FD4F19B478A52C33B50CDA1D90D656EC9C0E653BAE9AF4D97D58FB"
+    },
+    "contracts/fixture_consumer.py": {
+      "sha256": "2F3F91636F82C97ED7987A9EFB540A0C9003416CDCFAEF289518EF5BCBAF4CE1"
+    }
+  },
+  "deployments": {
+    "equivtest": null,
+    "fixtureMilestone": null,
+    "fixtureConsumer": null
+  },
+  "sourceParity": null,
+  "blocker": "The available StudioNet CLI accounts are encrypted and locked; no authorized password or private key was provided, so no deployment transaction was submitted."
+}

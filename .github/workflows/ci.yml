@@ -12,10 +12,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --upgrade pip
-      - run: pip install pytest genvm-linter==0.11.0
+      - run: pip install -r requirements.txt
       - run: python -m compileall -q contracts tests
       - run: pytest -q tests/test_contract_state.py
+      - run: pytest -q tests/direct
       - run: |
+          export GENVM_VERSION='v0.2.12'
           genvm-lint check contracts/equivtest.py
           genvm-lint check contracts/fixture_milestone.py
           genvm-lint check contracts/fixture_consumer.py
@@ -26,7 +28,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --prefix frontend --no-audit --no-fund
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node -e "const p=require('./node_modules/genlayer/package.json'); if(p.version!=='0.39.1') process.exit(1); console.log('genlayer CLI',p.version)"
+      - run: npm ci --prefix frontend --no-audit --no-fund
       - run: npm run typecheck --prefix frontend
       - run: npm run test --prefix frontend
       - run: npm run build --prefix frontend

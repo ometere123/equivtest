@@ -12,11 +12,21 @@ declare global {interface Window {ethereum?:EthereumProvider}}
 export const CHAIN_ID=61999;
 const PENDING_KEY="equivtest.pending.61999";
 export type Pending={hash:string;address:string;method:string;account:string};
+const parseChainId=(value:unknown)=>{
+  if(typeof value==="number"&&Number.isInteger(value))return value;
+  if(typeof value!=="string")return NaN;
+  const text=value.trim();
+  if(/^0x[\da-f]+$/i.test(text))return Number.parseInt(text,16);
+  if(/^\d+$/.test(text))return Number.parseInt(text,10);
+  return NaN;
+};
+const errorCode=(error:unknown)=>typeof error==="object"&&error!==null&&"code" in error?(error as {code?:unknown}).code:undefined;
+const isUnknownChainError=(error:unknown)=>errorCode(error)===4902||errorCode(error)==="4902"||errorCode(error)===-32602;
 export function pendingTransaction():Pending|null{
  if(typeof window==="undefined")return null;
  try{const raw=window.localStorage.getItem(PENDING_KEY);if(!raw)return null;
  const value=JSON.parse(raw) as Pending;
- return value && /^0x[0-9a-fA-F]{64}$/.test(value.hash)?value:null;
+ return value && /^0x[0-9a-fA-F]{64}$/.test(value.hash)&&isAddress(value.address)&&isAddress(value.account)&&typeof value.method==="string"?value:null;
  }catch{return null;}
 }
 
@@ -26,6 +36,29 @@ export const getProvider=():EthereumProvider|null=>
   typeof window==="undefined"?null:window.ethereum??null;
 
 export const readClient=()=>createClient({chain:studionet});
+async function ensureStudioNet(provider:EthereumProvider){
+  const current=await provider.request({method:"eth_chainId"});
+  if(parseChainId(current)!==CHAIN_ID){
+    try{
+      await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:"0xf22f"}]});
+    }catch(error){
+      if(!isUnknownChainError(error))throw error;
+      await provider.request({method:"wallet_addEthereumChain",params:[{
+        chainId:"0xf22f",chainName:"GenLayer StudioNet",
+        rpcUrls:["https://studio.genlayer.com/api"],nativeCurrency:{name:"GEN",symbol:"GEN",decimals:18}
+      }]});
+      await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:"0xf22f"}]});
+    }
+  }
+  const confirmed=await provider.request({method:"eth_chainId"});
+  if(parseChainId(confirmed)!==CHAIN_ID)throw Error("Wallet is not connected to GenLayer StudioNet (chain 61999).");
+}
+async function assertWalletReady(provider:EthereumProvider,account:string){
+  await ensureStudioNet(provider);
+  const accounts=await provider.request({method:"eth_accounts"});
+  if(!Array.isArray(accounts)||!accounts.some(value=>typeof value==="string"&&value.toLowerCase()===account.toLowerCase()))
+    throw Error("The connected wallet account changed. Reconnect before signing.");
+}
 export async function readAt(address:string,method:string,args:unknown[]=[]):Promise<unknown>{
   if(!isAddress(address)) throw Error("A valid contract address is required.");
   return readClient().readContract({
@@ -42,24 +75,23 @@ export async function connectWallet():Promise<string>{
   if(!provider) throw Error("Install an injected EIP-1193 wallet to write transactions.");
   const accounts=await provider.request({method:"eth_requestAccounts"}) as string[];
   if(!Array.isArray(accounts)||!accounts.length||!isAddress(accounts[0])) throw Error("Wallet did not return an account.");
-  const chain=await provider.request({method:"eth_chainId"});
-  if(Number.parseInt(String(chain),16)!==CHAIN_ID){
-    try {await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:"0xf22f"}]});}
-    catch {
-      await provider.request({method:"wallet_addEthereumChain",params:[{
-        chainId:"0xf22f",chainName:"GenLayer StudioNet",
-        rpcUrls:["https://studio.genlayer.com/api"],nativeCurrency:{name:"GEN",symbol:"GEN",decimals:18}
-      }]});
-      await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:"0xf22f"}]});
-    }
-  }
+  await ensureStudioNet(provider);
   return accounts[0];
 }
+function executionName(receipt:unknown){
+  if(!receipt||typeof receipt!=="object")return "";
+  const value=receipt as {txExecutionResultName?:unknown;txExecutionResult?:{status?:unknown};executionResult?:unknown};
+  const name=value.txExecutionResultName??value.txExecutionResult?.status??value.executionResult;
+  return typeof name==="string"?name:"";
+}
+const executionSucceeded=(receipt:unknown)=>executionName(receipt)==="FINISHED_WITH_RETURN";
 export async function submit(address:string,account:string,method:string,args:unknown[],
   onHash?:(hash:string)=>void):Promise<string>{
   if(!isAddress(address)||!isAddress(account)) throw Error("Missing contract address or wallet.");
   const provider=getProvider();
   if(!provider) throw Error("No injected wallet detected.");
+  if(pendingTransaction()) throw Error("A previous transaction is awaiting final execution verification. Resume it before submitting another write.");
+  await assertWalletReady(provider,account);
   const client=createClient({chain:studionet,account:account as `0x${string}`,provider:provider as never});
   const write={address:address as `0x${string}`,functionName:method,args:args as never[]};
   // StudioNet 61999 uses the stable 1.1.8 SDK, not the Consensus v0.6 fee-profile API.
@@ -68,10 +100,9 @@ export async function submit(address:string,account:string,method:string,args:un
   onHash?.(hash);
   const receipt=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});
   // FINALIZED is not equivalent to successful contract execution.
-  const raw=receipt as {txExecutionResultName?:string;txExecutionResult?:{status?:string};executionResult?:string};
-  const execution=raw.txExecutionResultName??raw.txExecutionResult?.status??raw.executionResult;
+  const execution=executionName(receipt);
   if(!execution) throw Error("Transaction finalized but execution success is unverified. Inspect receipt: "+hash);
-  if(!["FINISHED_WITH_RETURN","SUCCESS"].includes(String(execution)))
+  if(!executionSucceeded(receipt))
     throw Error("Transaction not successfully executed ("+execution+"): "+hash);
   window.localStorage.removeItem(PENDING_KEY);
   return hash;
@@ -82,9 +113,10 @@ export async function resumePending():Promise<string>{
   const receipt=await readClient().waitForTransactionReceipt({
     hash:pending.hash as never,status:TransactionStatus.FINALIZED
   });
-  const raw=receipt as {txExecutionResultName?:string};
-  if(raw.txExecutionResultName!=="FINISHED_WITH_RETURN")
-    throw Error("Transaction finalized without successful execution: "+pending.hash);
+  const execution=executionName(receipt);
+  if(!execution)throw Error("Transaction finalized but execution success is unverified: "+pending.hash);
+  if(!executionSucceeded(receipt))
+    throw Error("Transaction finalized without successful execution ("+execution+"): "+pending.hash);
   window.localStorage.removeItem(PENDING_KEY);
   return pending.hash;
 }
