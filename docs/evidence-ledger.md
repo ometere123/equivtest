@@ -55,7 +55,7 @@ The frontend security fixes include chain/account revalidation, exact `FINISHED_
 | Four-wallet browser demonstration | no deployed address / no configured production contract | not performed |
 | Vercel project | authenticated account inspected; no EquivTest project linked | not performed |
 | Vercel production URL | none created | blocked by missing verified contract address |
-| Final GitHub Actions run | requires the final pushed commit | pending |
+| Final GitHub Actions run for `5da015481e6c679229045bb82d9d698b0324b3b1` | [run 39070230292](https://github.com/ometere123/equivtest/actions/runs/39070230292): `python-and-contract` and `frontend` both passed | passed |
 
 The exact blocker is credential availability, not an RPC/network mismatch. The CLI listed funded accounts such as `praest-deployer`, but they reported `status: locked`; no password or private signing key was supplied or recoverable from the repository. No credential guessing or unverified deployment was attempted.
 

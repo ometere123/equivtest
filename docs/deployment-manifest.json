@@ -3,6 +3,8 @@
   "observedAt": "2026-10-17",
   "repository": "https://github.com/ometere123/equivtest",
   "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
+  "verifiedSourceCommit": "5da015481e6c679229045bb82d9d698b0324b3b1",
+  "verifiedCiRun": "https://github.com/ometere123/equivtest/actions/runs/39070230292",
   "network": {
     "name": "GenLayer StudioNet",
     "chainId": 61999,

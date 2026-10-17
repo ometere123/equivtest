@@ -135,6 +135,7 @@ The source and test changes in this checkout were verified locally as follows:
 | Next production build | passed; all seven routes generated |
 | Playwright desktop/mobile smoke tests | 4 passed |
 | npm production dependency audit | root 0 vulnerabilities; frontend 0 vulnerabilities |
+| GitHub Actions final pushed run | 2 jobs passed: `python-and-contract`, `frontend` |
 
 The Windows Direct Mode run is not counted as contract evidence because `genlayer-test` 0.29.2 currently fails in its loader while deleting an open temporary file (`PermissionError`, Windows file-lock behavior). The same six tests pass under WSL. Live StudioNet deployment, live four-wallet browser operations, and production Vercel deployment remain separate evidence gates until authorized deployment credentials and a verified contract address are available; see `docs/evidence-ledger.md`.
 
@@ -161,4 +162,4 @@ The intended contract source hashes currently are:
 
 GitHub Actions installs the root CLI lockfile and frontend lockfile with `npm ci`, checks `genlayer@0.39.1`, runs deterministic and Direct Mode tests, validates all contracts with `genvm-linter==0.11.0`, and runs typecheck, unit, build, and Playwright checks. The workflow is intentionally not a Vercel deployment workflow.
 
-CI result URLs and the final commit compare link are added to the closeout report only after the verified changes are pushed and the resulting GitHub run completes.
+The final verified CI run is [39070230292](https://github.com/ometere123/equivtest/actions/runs/39070230292). The closeout report supplies the final commit compare link and separates these automated results from the still-blocked live deployment evidence.
