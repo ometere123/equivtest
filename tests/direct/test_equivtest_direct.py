@@ -2,6 +2,8 @@ import json
 
 import pytest
 
+SDK_VERSION = "v0.2.12"
+
 
 def _seed_evaluation_state(contract, owner, evidence):
     target_address = "0x" + "2" * 40
@@ -40,7 +42,7 @@ def _seed_evaluation_state(contract, owner, evidence):
 def test_direct_consensus_input_accepts_all_semantic_outcomes(
     direct_vm, direct_deploy, direct_alice, verdict, reason, expected
 ):
-    contract = direct_deploy("contracts/equivtest.py")
+    contract = direct_deploy("contracts/equivtest.py", sdk_version=SDK_VERSION)
     direct_vm.sender = direct_alice
     _seed_evaluation_state(contract, direct_alice, {"output": {"state": "observed"}})
     direct_vm.mock_llm(
@@ -58,7 +60,7 @@ def test_direct_consensus_input_accepts_all_semantic_outcomes(
 
 
 def test_direct_validator_rejects_malformed_leader_proposal(direct_vm, direct_deploy, direct_alice):
-    contract = direct_deploy("contracts/equivtest.py")
+    contract = direct_deploy("contracts/equivtest.py", sdk_version=SDK_VERSION)
     direct_vm.sender = direct_alice
     _seed_evaluation_state(contract, direct_alice, {"output": {"state": "observed"}})
     direct_vm.mock_llm(
@@ -76,7 +78,7 @@ def test_direct_validator_rejects_malformed_leader_proposal(direct_vm, direct_de
 
 
 def test_direct_deploy_and_freeze_lifecycle(direct_vm, direct_deploy, direct_alice):
-    contract = direct_deploy("contracts/equivtest.py")
+    contract = direct_deploy("contracts/equivtest.py", sdk_version=SDK_VERSION)
     direct_vm.sender = direct_alice
 
     suite_target = "0x" + "2" * 40
@@ -112,7 +114,7 @@ def test_direct_deploy_and_freeze_lifecycle(direct_vm, direct_deploy, direct_ali
 
 
 def test_direct_authorization_and_run_guards(direct_vm, direct_deploy, direct_alice, direct_bob):
-    contract = direct_deploy("contracts/equivtest.py")
+    contract = direct_deploy("contracts/equivtest.py", sdk_version=SDK_VERSION)
     direct_vm.sender = direct_alice
     contract.targets["T-1"] = json.dumps({
         "id": "T-1",
