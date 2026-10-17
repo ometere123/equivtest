@@ -166,7 +166,27 @@ class EquivTest(gl.Contract):
             "initiator": str(gl.message.sender_address), "state": "OPEN",
             "total": len(suite["case_ids"]), "pass": 0, "fail": 0,
             "inconclusive": 0, "outcome": "PENDING",
-            "suite_digest": suite["digest"]
+            "suite_digest": suite["digest"], "recheck_of": ""
+        })
+        return ident
+
+    @gl.public.write
+    def open_recheck(self, previous_run_id: str) -> str:
+        """Create an independently evaluated run without modifying a prior assessment."""
+        raw = self.runs.get(previous_run_id, "")
+        require(bool(raw), "Prior run not found")
+        previous = decoded(raw)
+        require(previous["state"] == "CLOSED", "Only completed runs can be rechecked")
+        suite = decoded(self.suites[previous["suite_id"]])
+        require(suite["frozen"] and suite["digest"] == previous["suite_digest"], "Suite digest mismatch")
+        self.run_count += u64(1)
+        ident = key("R", self.run_count)
+        self.runs[ident] = encoded({
+            "id": ident, "suite_id": previous["suite_id"], "target_id": previous["target_id"],
+            "initiator": str(gl.message.sender_address), "state": "OPEN",
+            "total": len(suite["case_ids"]), "pass": 0, "fail": 0,
+            "inconclusive": 0, "outcome": "PENDING",
+            "suite_digest": suite["digest"], "recheck_of": previous_run_id
         })
         return ident
 

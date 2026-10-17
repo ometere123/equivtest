@@ -10,6 +10,16 @@ export interface EthereumProvider {
 }
 declare global {interface Window {ethereum?:EthereumProvider}}
 export const CHAIN_ID=61999;
+const PENDING_KEY="equivtest.pending.61999";
+export type Pending={hash:string;address:string;method:string;account:string};
+export function pendingTransaction():Pending|null{
+ if(typeof window==="undefined")return null;
+ try{const raw=window.localStorage.getItem(PENDING_KEY);if(!raw)return null;
+ const value=JSON.parse(raw) as Pending;
+ return value && /^0x[0-9a-fA-F]{64}$/.test(value.hash)?value:null;
+ }catch{return null;}
+}
+
 export const ADDRESS=process.env.NEXT_PUBLIC_EQUIVTEST_ADDRESS||"";
 export const isConfigured=()=>isAddress(ADDRESS);
 export const getProvider=():EthereumProvider|null=>
@@ -54,6 +64,7 @@ export async function submit(address:string,account:string,method:string,args:un
   const write={address:address as `0x${string}`,functionName:method,args:args as never[]};
   // StudioNet 61999 uses the stable 1.1.8 SDK, not the Consensus v0.6 fee-profile API.
   const hash=await client.writeContract({...write,value:BigInt(0)});
+  window.localStorage.setItem(PENDING_KEY,JSON.stringify({hash,address,method,account}));
   onHash?.(hash);
   const receipt=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});
   // FINALIZED is not equivalent to successful contract execution.
@@ -62,7 +73,20 @@ export async function submit(address:string,account:string,method:string,args:un
   if(!execution) throw Error("Transaction finalized but execution success is unverified. Inspect receipt: "+hash);
   if(!["FINISHED_WITH_RETURN","SUCCESS"].includes(String(execution)))
     throw Error("Transaction not successfully executed ("+execution+"): "+hash);
+  window.localStorage.removeItem(PENDING_KEY);
   return hash;
+}
+export async function resumePending():Promise<string>{
+  const pending=pendingTransaction();
+  if(!pending)throw Error("No pending transaction stored on this device.");
+  const receipt=await readClient().waitForTransactionReceipt({
+    hash:pending.hash as `0x${string}`,status:TransactionStatus.FINALIZED
+  });
+  const raw=receipt as {txExecutionResultName?:string};
+  if(raw.txExecutionResultName!=="FINISHED_WITH_RETURN")
+    throw Error("Transaction finalized without successful execution: "+pending.hash);
+  window.localStorage.removeItem(PENDING_KEY);
+  return pending.hash;
 }
 export async function writeApp(account:string,method:string,args:unknown[],onHash?:(h:string)=>void){
   if(!isConfigured()) throw Error("EquivTest address is not configured.");

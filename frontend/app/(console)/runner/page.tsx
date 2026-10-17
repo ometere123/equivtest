@@ -29,6 +29,8 @@ export default function Runner(){
   <form className="form" onSubmit={e=>{e.preventDefault();void mutate(open,"open_run",[suiteId]);}}>
   <div className="field"><label>Frozen suite ID</label><input value={suiteId} onChange={e=>setSuiteId(e.target.value)} placeholder="S-1" list="suite-options" required/><datalist id="suite-options">{suites.items.filter(x=>x.frozen).map(s=><option key={s.id} value={s.id}>{s.title}</option>)}</datalist></div>
   <Action busy={open.busy}>Open run on chain</Action></form><MutationStatus state={open}/>
+  <div className="divider"/><h3>Linked recheck</h3><p className="note">After a run closes, a recheck opens a fresh run against the same frozen suite and records its predecessor without changing prior verdicts.</p>
+  <button type="button" className="btn btn-outline" disabled={open.busy||!runId||run.value?.state!=="CLOSED"} onClick={()=>void mutate(open,"open_recheck",[runId])}>Recheck closed run</button>
   <p className="note" style={{marginTop:12}}>Read the new run ID from the refreshed list. A global counter alone is not an authenticated ownership receipt.</p>
  </section>
  <section className="big-card"><div className="eyebrow">Step 2</div><h2>Choose an active run</h2>

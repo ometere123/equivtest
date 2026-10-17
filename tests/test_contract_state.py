@@ -204,3 +204,19 @@ def test_versioned_follow_up_without_mutation(runtime):
     assert original != revised
     assert json.loads(c.get_suite(suite))["digest"] == original
     assert json.loads(c.get_suite(new))["supersedes"] == suite
+
+def test_linked_recheck_preserves_original_verdict(runtime):
+    c, suite, case, gl, targets = prepared(runtime)
+    c.freeze_suite(suite)
+    old = c.open_run(suite)
+    c.capture_case(old, case, "good")
+    assert c.evaluate_case(old, case) == "PASS"
+    assert c.close_run(old) == "PASS"
+    new = c.open_recheck(old)
+    record = json.loads(c.get_run(new))
+    assert record["recheck_of"] == old
+    assert record["state"] == "OPEN"
+    assert c.get_verdict(new, case) == ""
+    assert json.loads(c.get_run(old))["outcome"] == "PASS"
+    with pytest.raises(ValueError, match="Only completed"):
+        c.open_recheck(new)
