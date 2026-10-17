@@ -80,7 +80,7 @@ export async function resumePending():Promise<string>{
   const pending=pendingTransaction();
   if(!pending)throw Error("No pending transaction stored on this device.");
   const receipt=await readClient().waitForTransactionReceipt({
-    hash:pending.hash as `0x${string}`,status:TransactionStatus.FINALIZED
+    hash:pending.hash as never,status:TransactionStatus.FINALIZED
   });
   const raw=receipt as {txExecutionResultName?:string};
   if(raw.txExecutionResultName!=="FINISHED_WITH_RETURN")
