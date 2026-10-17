@@ -50,7 +50,7 @@ export function useRecent<T>(prefix:string,count:number,method:string,limit=30){
     for(let index=count;index>=start;index-=5){
       const ids=Array.from({length:Math.min(5,index-start+1)},(_,i)=>prefix+"-"+(index-i));
       const group=await Promise.all(ids.map(id=>readRecord<T>(method,[id])));
-      result.push(...group.filter((x):x is T=>x!==null));
+      for(const row of group){if(row!==null)result.push(row as T);}
     }setItems(result);
   }catch(e){setError(presentError(e));}finally{setPending(false);}
  },[prefix,count,method,limit]);

@@ -7,7 +7,7 @@ export default function Dashboard(){
  const {counts,error,refresh}=useCounts();const {items:runs}=useRecent<Run>("R",counts?.runs??0,"get_run",6);
  return <><PageTitle kicker="Your testing workspace" title="Overview" detail="Track registered contracts, frozen suites and consensus results. All figures are read directly from the public EquivTest contract."/>
  <div className="inline"><Refresh onClick={refresh}/></div><DataMessage value={error}/>
- <div className="grid">{[[Boxes,"Targets",counts?.targets],[BookOpenCheck,"Suites",counts?.suites],[FlaskConical,"Cases",counts?.cases],[ShieldCheck,"Runs",counts?.runs]].map(([Icon,label,value],i)=>{
+ <div className="grid">{([[Boxes,"Targets",counts?.targets],[BookOpenCheck,"Suites",counts?.suites],[FlaskConical,"Cases",counts?.cases],[ShieldCheck,"Runs",counts?.runs]] as [typeof Boxes,string,number|undefined][]).map(([Icon,label,value],i)=>{
  const Component=Icon as typeof Boxes;return <div className="card" key={i}><Component size={21} color="#b3edcb"/><div className="metric">{value??"—"}</div><div className="metric-label">{String(label)}</div></div>;
  })}</div>
  <div className="panel-grid"><div className="big-card"><div className="eyebrow">Latest activity</div><h2>Recent test runs</h2>

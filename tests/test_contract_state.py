@@ -178,7 +178,7 @@ def test_failed_or_disputed_evaluation_writes_nothing(runtime):
     run=c.open_run(suite)
     c.capture_case(run,case,"obs")
     gl.nondet.exec_prompt=lambda *a, **kw: {"verdict":"PASS","reason_code":"MEETS_REQUIREMENT","failed_criteria":[],"evidence_refs":[],"summary":""}
-    with pytest.raises(ValueError, match="Invalid summary"):
+    with pytest.raises(ValueError, match="Validator disagreement"):
         c.evaluate_case(run,case)
     assert c.get_verdict(run,case) == ""
     with pytest.raises(ValueError, match="All cases"):

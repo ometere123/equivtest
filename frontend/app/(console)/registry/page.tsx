@@ -6,7 +6,7 @@ import {Conformance,Run,Suite} from "@/lib/schema";
 export default function Registry(){
  const [runId,setRunId]=useState("");const [suiteId,setSuiteId]=useState("");const [targetId,setTargetId]=useState("");
  const {counts,refresh}=useCounts();const recent=useRecent<Run>("R",counts?.runs??0,"get_run",30);
- const inspected=useRecord<Conformance>("get_conformance",runId+suiteId+targetId,[runId,suiteId,targetId]);
+ const inspected=useRecord<Conformance>("get_conformance",runId&&suiteId&&targetId?runId+"/"+suiteId+"/"+targetId:"",[runId,suiteId,targetId]);
  return <><PageTitle kicker="05 / Public conformance" title="Certification registry" detail="Read the on-chain conformance status for one exact run, frozen suite and registered target. A certification never proves overall security or real-world truth beyond observed evidence."/>
  <section className="big-card"><h2>Verify certification</h2><div className="two" style={{marginBottom:13}}>
  <div className="field"><label>Run ID</label><input value={runId} onChange={e=>setRunId(e.target.value)} placeholder="R-1"/></div>

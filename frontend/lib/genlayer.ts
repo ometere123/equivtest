@@ -1,6 +1,6 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
-import { TransactionHashVariant } from "genlayer-js/types";
+import { TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
 import { isAddress, parseRecord } from "./schema";
 
 export interface EthereumProvider {
@@ -52,12 +52,10 @@ export async function submit(address:string,account:string,method:string,args:un
   if(!provider) throw Error("No injected wallet detected.");
   const client=createClient({chain:studionet,account:account as `0x${string}`,provider:provider as never});
   const write={address:address as `0x${string}`,functionName:method,args:args as never[]};
-  const estimate=await client.estimateTransactionFeesForWrite(write);
-  const hash=await client.writeContract({
-    ...write,fees:{distribution:estimate.distribution,feeValue:estimate.feeValue}
-  });
+  // StudioNet 61999 uses the stable 1.1.8 SDK, not the Consensus v0.6 fee-profile API.
+  const hash=await client.writeContract({...write,value:BigInt(0)});
   onHash?.(hash);
-  const receipt=await client.waitForFinalization({hash});
+  const receipt=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});
   // FINALIZED is not equivalent to successful contract execution.
   const raw=receipt as {txExecutionResultName?:string;txExecutionResult?:{status?:string};executionResult?:string};
   const execution=raw.txExecutionResultName??raw.txExecutionResult?.status??raw.executionResult;
