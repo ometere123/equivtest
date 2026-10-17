@@ -162,4 +162,4 @@ The intended contract source hashes currently are:
 
 GitHub Actions installs the root CLI lockfile and frontend lockfile with `npm ci`, checks `genlayer@0.39.1`, runs deterministic and Direct Mode tests, validates all contracts with `genvm-linter==0.11.0`, and runs typecheck, unit, build, and Playwright checks. The workflow is intentionally not a Vercel deployment workflow.
 
-The final verified CI run is [39070230292](https://github.com/ometere123/equivtest/actions/runs/39070230292). The closeout report supplies the final commit compare link and separates these automated results from the still-blocked live deployment evidence.
+The final verified CI run is [39070406109](https://github.com/ometere123/equivtest/actions/runs/39070406109). The closeout report supplies the final commit compare link and separates these automated results from the still-blocked live deployment evidence.
