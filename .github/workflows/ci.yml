@@ -1,0 +1,36 @@
+name: EquivTest CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  python-and-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip
+      - run: pip install pytest genvm-linter==0.11.0
+      - run: python -m compileall -q contracts tests
+      - run: pytest -q tests/test_contract_state.py
+      - run: |
+          genvm-lint check contracts/equivtest.py
+          genvm-lint check contracts/fixture_milestone.py
+          genvm-lint check contracts/fixture_consumer.py
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package.json
+      - run: npm install --prefix frontend --no-audit --no-fund
+      - run: npm run typecheck --prefix frontend
+      - run: npm run test --prefix frontend
+      - run: npm run build --prefix frontend
+      - run: npx --prefix frontend playwright install chromium --with-deps
+      - run: cd frontend && npx playwright test

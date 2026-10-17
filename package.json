@@ -1,0 +1,12 @@
+{
+  "name": "equivtest-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test": "npm --prefix frontend run test",
+    "contract:lint": "genvm-lint check contracts/equivtest.py contracts/fixture_milestone.py contracts/fixture_consumer.py"
+  },
+  "devDependencies": {"genlayer": "0.39.1"}
+}
