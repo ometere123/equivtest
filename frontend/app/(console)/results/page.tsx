@@ -1,15 +1,16 @@
 "use client";
 import {Suspense,useState} from "react";
 import {useSearchParams} from "next/navigation";
-import {DataMessage,PageTitle,Refresh,Status,useRecord} from "@/components/Kit";
+import {DataMessage,PageTitle,Refresh,Status,useCounts,useRecent,useRecord} from "@/components/Kit";
 import {Case,Run,Snapshot,Suite,Verdict,short} from "@/lib/schema";
 function ResultsInner(){
  const params=useSearchParams();const [id,setId]=useState(params.get("run")??"");
+ const {counts,refresh:refreshCounts}=useCounts();const recent=useRecent<Run>("R",counts?.runs??0,"get_run",30);
  const {value:run,error,refresh}=useRecord<Run>("get_run",id);
  const suite=useRecord<Suite>("get_suite",run?.suite_id??"");
  return <><PageTitle kicker="04 / Evidence history" title="Results explorer" detail="Inspect immutable verdict records and the exact frozen evidence each finding references. An execution error is not a semantic verdict."/>
- <div className="inline"><div className="field" style={{minWidth:230}}><label>Run identifier</label><input value={id} onChange={e=>setId(e.target.value)} placeholder="R-1"/></div><Refresh onClick={()=>{void refresh();void suite.refresh();}}/></div>
- <DataMessage value={error}/><div className="grid">{[["Run state",run?.state??"—"],["Outcome",run?.outcome??"—"],["Pass",run?.pass??"—"],["Fail",run?.fail??"—"]].map(([k,v])=><div className="card" key={k}><div className="metric-label">{k}</div><div className="metric" style={{fontSize:24}}>{v}</div></div>)}</div>
+ <div className="inline"><div className="field" style={{minWidth:280}}><label>Public run</label><select value={id} onChange={e=>setId(e.target.value)}><option value="">Choose a run…</option>{recent.items.map(item=><option key={item.id} value={item.id}>{item.id} · {item.suite_id} · {item.outcome}</option>)}</select></div><Refresh onClick={()=>{void refreshCounts();void recent.refresh();void refresh();void suite.refresh();}}/></div>
+ <DataMessage value={error||recent.error}/><div className="grid">{[["Run state",run?.state??"—"],["Outcome",run?.outcome??"—"],["Pass",run?.pass??"—"],["Fail",run?.fail??"—"]].map(([k,v])=><div className="card" key={k}><div className="metric-label">{k}</div><div className="metric" style={{fontSize:24}}>{v}</div></div>)}</div>
  {run&&<div className="big-card"><h2>{run.id} · {run.suite_id}</h2><div className="note code">Initiator: {short(run.initiator,12)} · Target: {run.target_id} · Suite digest: {run.suite_digest}</div>
  <p className="note">Passing {run.pass}, failing {run.fail}, inconclusive {run.inconclusive}, total {run.total}. Counts are final only when the run is CLOSED.</p>{run.recheck_of&&<div className="note">Linked recheck of <a href={"/results?run="+encodeURIComponent(run.recheck_of)} style={{color:"#b3edcb"}}>{run.recheck_of}</a>; the predecessor is immutable.</div>}</div>}
  {suite.value&&<div style={{marginTop:25}}><h2>Case-by-case findings</h2><div className="rows">{suite.value.case_ids.map(c=><ResultCard key={c} runId={id} caseId={c}/>)}</div></div>}

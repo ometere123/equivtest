@@ -49,19 +49,36 @@ class Public:
         return fn
 
 
-def evidence(*, status="CONTESTED", release_state="DEFERRED", findings=0, injection=""):
+def evidence(*, status="CONTESTED", release_state="ACTIVATED", findings=1,
+             scope="TEST_COHORT", data_exposure="NONE", rollback_ready=True, injection=""):
+    reviewer_a_text = injection or "The bounded exception limits the change to synthetic identities and rollback is ready."
     return {
         "schema": "equivtest.case/1", "observation_id": "obs-1",
         "provenance": "TARGET_PUBLIC_VIEW",
-        "input": {"release_state": release_state, "findings": findings},
-        "output": {"activation": release_state},
-        "state": {"reviewer_count": 2 if status == "CONTESTED" else 1},
-        "observed": {"release_state": release_state, "unresolved_critical_findings": findings},
-        "claims": {"reviewer_a": injection or "A says the rule allows this.", "reviewer_b": "B says the rule blocks this."},
+        "input": {"release_state": release_state, "unresolved_critical_findings": findings,
+                  "affected_scope": scope, "data_exposure": data_exposure, "rollback_ready": rollback_ready},
+        "output": {"activation": release_state, "exception_invoked": True},
+        "state": {"reviewer_count": 2 if status == "CONTESTED" else 1,
+                   "reviewer_disagreement": status == "CONTESTED", "dispute_complete": status == "CONTESTED",
+                   "wallet_separation_only": True, "real_world_authority_attested": False},
+        "observed": {"release_state": release_state, "unresolved_critical_findings": findings,
+                     "affected_scope": scope, "data_exposure": data_exposure, "rollback_ready": rollback_ready,
+                     "change_summary": "A bounded authorization change is being exercised against a defined cohort.",
+                     "exception_basis": "The exception is limited to synthetic identities and rollback is ready.",
+                     "release_note": "Public release observation."},
+        "claims": {"reviewer_a": {"author": REVIEWER_A, "position": "CONFORMING",
+                                    "interpretation": reviewer_a_text,
+                                    "cited_fact": "observed.exception_basis"},
+                    "reviewer_b": {"author": REVIEWER_B if status == "CONTESTED" else "", "position": "NONCONFORMING" if status == "CONTESTED" else "",
+                                    "interpretation": "The remaining finding may cross a production boundary and the exception may not apply." if status == "CONTESTED" else "",
+                                    "cited_fact": "observed.affected_scope" if status == "CONTESTED" else ""}},
         "dispute": {
             "status": status, "author_a": REVIEWER_A, "author_b": REVIEWER_B if status == "CONTESTED" else "",
             "position_a": "CONFORMING", "position_b": "NONCONFORMING" if status == "CONTESTED" else "",
+            "cited_fact_a": "observed.exception_basis",
+            "cited_fact_b": "observed.affected_scope" if status == "CONTESTED" else "",
         },
+        "publisher": OWNER,
     }
 
 
@@ -87,15 +104,15 @@ def runtime(monkeypatch):
         ev = payload["evidence"]
         if ev["dispute"]["status"] == "INCOMPLETE":
             return {"verdict": "INCONCLUSIVE", "reason_code": "INSUFFICIENT_EVIDENCE",
-                    "failed_criteria": [], "evidence_refs": ["dispute.status", "state.reviewer_count"],
+                    "failed_criteria": [], "evidence_refs": ["dispute.status", "state.reviewer_count", "observed.affected_scope"],
                     "summary": "The second independent interpretation is missing."}
-        if ev["observed"]["release_state"] == "ACTIVATED" and ev["observed"]["unresolved_critical_findings"] > 0:
+        if ev["observed"]["affected_scope"] in ("SHARED_AUTH", "PRODUCTION_USERS") or ev["observed"]["data_exposure"] in ("POSSIBLE", "CONFIRMED"):
             return {"verdict": "FAIL", "reason_code": "RULE_CONTRADICTION",
-                    "failed_criteria": ["main"], "evidence_refs": ["dispute.position_a", "observed.release_state", "observed.unresolved_critical_findings"],
-                    "summary": "Activation conflicts with the frozen safety requirement."}
+                    "failed_criteria": ["main"], "evidence_refs": ["dispute.position_a", "dispute.position_b", "claims.reviewer_a.interpretation", "claims.reviewer_b.interpretation", "observed.affected_scope", "observed.data_exposure", "observed.change_summary"],
+                    "summary": "The bounded evidence makes the remaining issue material to a production boundary."}
         return {"verdict": "PASS", "reason_code": "MEETS_REQUIREMENT",
-                "failed_criteria": [], "evidence_refs": ["dispute.position_a", "observed.release_state", "state.reviewer_count"],
-                "summary": "The bounded public state supports the frozen requirement."}
+                "failed_criteria": [], "evidence_refs": ["dispute.position_a", "dispute.position_b", "claims.reviewer_a.interpretation", "claims.reviewer_b.interpretation", "observed.affected_scope", "observed.data_exposure", "observed.rollback_ready"],
+                "summary": "The bounded evidence supports the narrowly documented test-only exception."}
 
     GL.nondet.exec_prompt = fake_judgment
     mock.gl = GL
@@ -110,7 +127,7 @@ def runtime(monkeypatch):
     spec.loader.exec_module(mod)
 
     class Target:
-        version = "fixture-adversarial-1"
+        version = "fixture-adversarial-2"
         current = evidence()
 
         def view(self):
@@ -142,8 +159,8 @@ def prepared(runtime):
     case_id = contract.add_case(
         suite_id,
         "Contested release interpretation",
-        "An activated release with an unresolved critical finding must not satisfy the frozen safety promise.",
-        "PASS requires bounded public state and the independent dispute record to support compatibility. FAIL requires a demonstrated contradiction. Missing independent evidence is inconclusive.",
+        "An activated release may proceed only when the bounded evidence supports no material security defect or a narrowly documented test-only exception. Materiality depends on production authorization and customer-data impact, not the finding count alone.",
+        "PASS requires substantive judgment that the evidence supports no material defect or a valid synthetic-cohort exception with no customer data and rollback ready. FAIL requires a demonstrated production-boundary or customer-data contradiction. Ambiguous materiality is inconclusive.",
         "CRITICAL",
     )
     gl.message.sender_address = CURATOR
@@ -207,7 +224,7 @@ def test_duplicate_registration_is_idempotent_and_version_drift_is_rejected(runt
     gl.message.sender_address = OWNER
     assert c.register_target("0x" + "8" * 40, "Same target") == "T-1"
     assert c.target_count == 1
-    targets["0x" + "8" * 40].version = "fixture-adversarial-2"
+    targets["0x" + "8" * 40].version = "fixture-adversarial-3"
     with pytest.raises(ValueError, match="another version"):
         c.register_target("0x" + "8" * 40, "Changed target")
     assert c.target_count == 1
@@ -218,7 +235,7 @@ def test_capture_rechecks_declared_target_version(runtime):
     c, _, suite, case, gl, targets, _ = state
     gl.message.sender_address = TESTER
     run = c.open_run(suite)
-    targets["0x" + "8" * 40].version = "fixture-adversarial-2"
+    targets["0x" + "8" * 40].version = "fixture-adversarial-3"
     with pytest.raises(ValueError, match="Target version mismatch"):
         c.capture_case(run, case, "version-drift")
     assert c.get_snapshot(run, case) == ""
@@ -260,7 +277,7 @@ def test_external_json_decode_failures_are_recoverable(runtime):
 def test_semantic_contradiction_not_shape_only(runtime):
     state = prepared(runtime)
     c, target_id, suite, case, run, gl, _, target = open_by_tester(state)
-    target.current = evidence(release_state="ACTIVATED", findings=1)
+    target.current = evidence(scope="PRODUCTION_USERS", data_exposure="POSSIBLE")
     c.capture_case(run, case, "bad")
     assert c.evaluate_case(run, case) == "FAIL"
     assert c.close_run(run) == "FAIL"
@@ -280,9 +297,9 @@ def test_failed_or_disputed_evaluation_writes_nothing(runtime):
     c, _, suite, case, run, gl, _, _ = open_by_tester(prepared(runtime))
     c.capture_case(run, case, "obs")
     leader = {"verdict": "PASS", "reason_code": "MEETS_REQUIREMENT", "failed_criteria": [],
-              "evidence_refs": ["dispute.position_a", "observed.release_state"], "summary": "Valid."}
+              "evidence_refs": ["dispute.position_a", "dispute.position_b", "claims.reviewer_a.interpretation", "claims.reviewer_b.interpretation", "observed.affected_scope", "observed.data_exposure", "observed.rollback_ready"], "summary": "Valid."}
     validator = {"verdict": "FAIL", "reason_code": "RULE_CONTRADICTION", "failed_criteria": ["main"],
-                 "evidence_refs": ["dispute.position_b", "observed.release_state"], "summary": "Disagrees."}
+                 "evidence_refs": ["dispute.position_a", "dispute.position_b", "claims.reviewer_a.interpretation", "claims.reviewer_b.interpretation", "observed.affected_scope", "observed.data_exposure", "observed.change_summary"], "summary": "Disagrees."}
     gl.nondet.exec_prompt = lambda prompt, response_format="json": leader if not hasattr(gl, "_called") else validator
     gl._called = False
     def divided(prompt, response_format="json"):
@@ -309,6 +326,49 @@ def test_invented_reference_and_prompt_injection_are_rejected(runtime):
     gl.nondet.exec_prompt = lambda prompt, response_format="json": {
         "verdict": "PASS", "reason_code": "MEETS_REQUIREMENT", "failed_criteria": [],
         "evidence_refs": ["observed.not_a_real_field", "dispute.position_a"], "summary": "Invented."
+    }
+    with pytest.raises(ValueError, match="Validator disagreement"):
+        c.evaluate_case(run, case)
+    assert c.get_verdict(run, case) == ""
+
+
+def test_role_provenance_and_authority_markers_are_not_self_attested(runtime):
+    state = prepared(runtime)
+    c, _, suite, case, run, gl, _, target = open_by_tester(state)
+    forged = evidence()
+    forged["claims"]["reviewer_a"]["author"] = OWNER
+    target.current = forged
+    with pytest.raises(ValueError, match="Publisher cannot review"):
+        c.capture_case(run, case, "forged-reviewer")
+    assert c.get_snapshot(run, case) == ""
+
+    state = prepared(runtime)
+    c, _, suite, case, run, gl, _, target = open_by_tester(state)
+    forged = evidence()
+    forged["state"]["real_world_authority_attested"] = True
+    target.current = forged
+    with pytest.raises(ValueError, match="authority claim"):
+        c.capture_case(run, case, "forged-authority")
+    assert c.get_snapshot(run, case) == ""
+
+    state = prepared(runtime)
+    c, _, suite, case, run, gl, _, target = open_by_tester(state)
+    forged = evidence()
+    forged["claims"]["reviewer_a"]["author"] = TESTER
+    forged["dispute"]["author_a"] = TESTER
+    target.current = forged
+    with pytest.raises(ValueError, match="role overlaps"):
+        c.capture_case(run, case, "tester-reviewer")
+    assert c.get_snapshot(run, case) == ""
+
+
+def test_binary_verdict_requires_relevant_materiality_and_testimony_citations(runtime):
+    c, _, suite, case, run, gl, _, _ = open_by_tester(prepared(runtime))
+    c.capture_case(run, case, "irrelevant-citations")
+    gl.nondet.exec_prompt = lambda prompt, response_format="json": {
+        "verdict": "PASS", "reason_code": "MEETS_REQUIREMENT", "failed_criteria": [],
+        "evidence_refs": ["dispute.position_a", "observed.affected_scope"],
+        "summary": "The shape is valid but the materiality evidence is not cited.",
     }
     with pytest.raises(ValueError, match="Validator disagreement"):
         c.evaluate_case(run, case)

@@ -23,22 +23,38 @@ def address(value):
     return str(value).lower()
 
 
-def _evidence(status="CONTESTED", release_state="DEFERRED", findings=0):
+def _evidence(status="CONTESTED", release_state="ACTIVATED", findings=1,
+              scope="TEST_COHORT", data_exposure="NONE", rollback_ready=True):
     return {
         "schema": "equivtest.case/1", "observation_id": "direct",
         "provenance": "TARGET_PUBLIC_VIEW",
-        "input": {"release_state": release_state, "findings": findings},
-        "output": {"activation": release_state},
-        "state": {"reviewer_count": 2 if status == "CONTESTED" else 1},
-        "observed": {"release_state": release_state, "unresolved_critical_findings": findings},
-        "claims": {"reviewer_a": "A interpretation", "reviewer_b": "B interpretation"},
+        "input": {"release_state": release_state, "unresolved_critical_findings": findings,
+                  "affected_scope": scope, "data_exposure": data_exposure, "rollback_ready": rollback_ready},
+        "output": {"activation": release_state, "exception_invoked": True},
+        "state": {"reviewer_count": 2 if status == "CONTESTED" else 1,
+                   "reviewer_disagreement": status == "CONTESTED", "dispute_complete": status == "CONTESTED",
+                   "wallet_separation_only": True, "real_world_authority_attested": False},
+        "observed": {"release_state": release_state, "unresolved_critical_findings": findings,
+                     "affected_scope": scope, "data_exposure": data_exposure, "rollback_ready": rollback_ready,
+                     "change_summary": "A bounded authorization change is being exercised against a defined cohort.",
+                     "exception_basis": "The exception is limited to synthetic identities and rollback is ready.",
+                     "release_note": "Public release observation."},
+        "claims": {"reviewer_a": {"author": "0x" + "6" * 40, "position": "CONFORMING",
+                                    "interpretation": "The bounded exception limits the change to synthetic identities and rollback is ready.",
+                                    "cited_fact": "observed.exception_basis"},
+                    "reviewer_b": {"author": "0x" + "7" * 40 if status == "CONTESTED" else "", "position": "NONCONFORMING" if status == "CONTESTED" else "",
+                                    "interpretation": "The remaining finding may cross a production boundary and the exception may not apply." if status == "CONTESTED" else "",
+                                    "cited_fact": "observed.affected_scope" if status == "CONTESTED" else ""}},
         "dispute": {
             "status": status,
             "author_a": "0x" + "6" * 40,
             "author_b": "0x" + "7" * 40 if status == "CONTESTED" else "",
             "position_a": "CONFORMING",
             "position_b": "NONCONFORMING" if status == "CONTESTED" else "",
+            "cited_fact_a": "observed.exception_basis",
+            "cited_fact_b": "observed.affected_scope" if status == "CONTESTED" else "",
         },
+        "publisher": "0x" + "1" * 40,
     }
 
 
@@ -46,7 +62,7 @@ def _seed_evaluation_state(contract, owner, evidence):
     target_address = "0x" + "2" * 40
     contract.targets["T-1"] = json.dumps({
         "id": "T-1", "address": target_address, "label": "Direct target",
-        "version": "fixture-adversarial-1", "schema": "equivtest.case/1", "registrant": "0x" + "1" * 40,
+        "version": "fixture-adversarial-2", "schema": "equivtest.case/1", "registrant": "0x" + "1" * 40,
     }, sort_keys=True, separators=(",", ":"))
     contract.suites["S-1"] = json.dumps({
         "id": "S-1", "target_id": "T-1", "title": "Direct suite",
@@ -68,7 +84,7 @@ def _seed_evaluation_state(contract, owner, evidence):
     contract.snapshots["R-1/C-1"] = json.dumps({
         "run_id": "R-1", "case_id": "C-1", "suite_id": "S-1", "target_id": "T-1",
         "observation_id": "direct", "target_address": target_address,
-        "target_version": "fixture-adversarial-1", "suite_digest": "d" * 64,
+        "target_version": "fixture-adversarial-2", "suite_digest": "d" * 64,
         "manifest_digest": "m" * 64, "evidence": evidence,
         "evidence_digest": "e" * 64, "captured_by": address(owner), "provenance": "TARGET_PUBLIC_VIEW",
     }, sort_keys=True, separators=(",", ":"))
@@ -95,7 +111,7 @@ def test_direct_consensus_input_accepts_all_semantic_outcomes(
             "verdict": verdict,
             "reason_code": reason,
             "failed_criteria": ["main"] if verdict == "FAIL" else [],
-            "evidence_refs": ["dispute.position_a", "observed.release_state", "state.reviewer_count"],
+            "evidence_refs": ["dispute.position_a", "dispute.position_b", "claims.reviewer_a.interpretation", "claims.reviewer_b.interpretation", "observed.affected_scope", "observed.data_exposure", "observed.rollback_ready"],
             "summary": "Direct Mode semantic outcome.",
         }),
     )
@@ -111,7 +127,7 @@ def test_direct_validator_rejects_malformed_leader_proposal(direct_vm, direct_de
         r".*Frozen test and captured observations.*",
         json.dumps({
             "verdict": "PASS", "reason_code": "MEETS_REQUIREMENT", "failed_criteria": [],
-            "evidence_refs": ["dispute.position_a", "observed.release_state"], "summary": "Valid direct result.",
+            "evidence_refs": ["dispute.position_a", "dispute.position_b", "claims.reviewer_a.interpretation", "claims.reviewer_b.interpretation", "observed.affected_scope", "observed.data_exposure", "observed.rollback_ready"], "summary": "Valid direct result.",
         }),
     )
     assert contract.evaluate_case("R-1", "C-1") == "PASS"
@@ -128,7 +144,7 @@ def test_direct_deploy_and_freeze_lifecycle(direct_vm, direct_deploy, direct_ali
     suite_target = "0x" + "2" * 40
     contract.targets["T-1"] = json.dumps({
         "id": "T-1", "address": suite_target, "label": "Direct target",
-        "version": "fixture-adversarial-1", "schema": "equivtest.case/1", "registrant": "0x" + "1" * 40,
+        "version": "fixture-adversarial-2", "schema": "equivtest.case/1", "registrant": "0x" + "1" * 40,
     }, sort_keys=True, separators=(",", ":"))
     contract.target_count += 1
     suite_id = contract.create_suite("T-1", "Direct suite", "A bounded requirement", "", REQUIREMENT_AUTHOR)
@@ -163,7 +179,7 @@ def test_direct_authorization_and_run_guards(direct_vm, direct_deploy, direct_al
     direct_vm.sender = direct_alice
     contract.targets["T-1"] = json.dumps({
         "id": "T-1", "address": "0x" + "2" * 40, "label": "Direct target",
-        "version": "fixture-adversarial-1", "schema": "equivtest.case/1", "registrant": address(direct_bob),
+        "version": "fixture-adversarial-2", "schema": "equivtest.case/1", "registrant": address(direct_bob),
     }, sort_keys=True, separators=(",", ":"))
     contract.target_count += 1
     suite_id = contract.create_suite("T-1", "Suite", "Description", "", REQUIREMENT_AUTHOR)
@@ -188,16 +204,19 @@ def test_direct_authorization_and_run_guards(direct_vm, direct_deploy, direct_al
 def test_direct_adversarial_fixture_records_two_conflicting_parties(direct_vm, direct_deploy, direct_alice, direct_bob):
     fixture = direct_deploy("contracts/fixture_adversarial.py", sdk_version=SDK_VERSION)
     direct_vm.sender = direct_alice
-    fixture.publish_observation("release-1", "ACTIVATED", 1, "The public release was activated.")
+    fixture.publish_observation("release-1", "ACTIVATED", 1, "TEST_COHORT", "NONE", True,
+                                "A bounded authorization change is exercised against synthetic identities.",
+                                "The exception is limited to synthetic identities and rollback is ready.",
+                                "The public release was activated for the test cohort.")
     direct_vm.sender = direct_bob
-    fixture.submit_interpretation("release-1", "CONFORMING", "The finding is not material.", "observed.release_state")
+    fixture.submit_interpretation("release-1", "CONFORMING", "The test-only exception is valid because the affected scope is synthetic and rollback is ready.", "observed.exception_basis")
     direct_vm.sender = direct_alice
     with direct_vm.expect_revert("Developer cannot submit review"):
-        fixture.submit_interpretation("release-1", "NONCONFORMING", "The finding blocks activation.", "observed.unresolved_critical_findings")
+        fixture.submit_interpretation("release-1", "NONCONFORMING", "The unresolved finding blocks activation across the production authorization boundary.", "observed.affected_scope")
     # A third account supplies the opposing interpretation; the fixture never
     # lets one reviewer overwrite the first record.
     direct_vm.sender = bytes.fromhex("33" * 20)
-    fixture.submit_interpretation("release-1", "NONCONFORMING", "The unresolved finding blocks activation.", "observed.unresolved_critical_findings")
+    fixture.submit_interpretation("release-1", "NONCONFORMING", "The unresolved finding may cross the production authorization boundary.", "observed.affected_scope")
     record = json.loads(fixture.get_equivtest_case("release-1"))
     assert record["provenance"] == "TARGET_PUBLIC_VIEW"
     assert record["dispute"]["status"] == "CONTESTED"

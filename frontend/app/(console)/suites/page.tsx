@@ -18,7 +18,7 @@ function SuitesMain(){
  <div className="field"><label htmlFor="target-select">Registered target</label><select id="target-select" value={target} onChange={e=>setTarget(e.target.value)} required><option value="">Choose a registered target…</option>{targets.items.map(t=><option key={t.id} value={t.id}>{t.id} · {t.label} · {t.version}</option>)}</select></div>
  <FormField label="Suite title" value={name} onChange={setName} placeholder="Milestone integrity"/>
  <FormField label="Description" kind="textarea" value={description} onChange={setDescription} placeholder="What behavioural promises does this suite evaluate?"/>
- <FormField label="Supersedes suite ID (blank for new)" required={false} value={supersedes} onChange={setSupersedes} placeholder="S-2"/>
+ <div className="field"><label>Supersedes frozen suite (optional)</label><select value={supersedes} onChange={e=>setSupersedes(e.target.value)}><option value="">No predecessor</option>{recent.items.filter(s=>s.frozen&&s.target_id===target).map(s=><option key={s.id} value={s.id}>{s.id} · {s.title}</option>)}</select></div>
  <FormField label="Independent requirement author wallet" value={requirementAuthor} onChange={setRequirementAuthor} placeholder="0x… (must differ from curator and target registrant)"/>
  <div className="actions"><Action busy={create.busy}>Create draft suite</Action></div></form><MutationStatus state={create}/></section>
  <section className="big-card"><div className="inline" style={{justifyContent:"space-between"}}><h2>Suites</h2><Refresh onClick={()=>{void refresh();void recent.refresh();}}/></div><DataMessage value={recent.error}/>
@@ -26,7 +26,7 @@ function SuitesMain(){
  {!recent.items.length&&<div className="empty">Create a suite against a registered target.</div>}</div></section></div>
  <div className="panel-grid"><section className="big-card"><h2>Define a semantic case</h2><p className="note">Select a draft suite by clicking it above, or supply an ID below.</p>
  <form className="form" onSubmit={onAdd}>
- <FormField label="Suite ID" value={suiteId} onChange={setSuiteId} placeholder="S-1"/>
+ <div className="field"><label>Draft suite</label><select value={suiteId} onChange={e=>setSuiteId(e.target.value)} required><option value="">Choose a draft suite…</option>{recent.items.filter(s=>!s.frozen).map(s=><option key={s.id} value={s.id}>{s.id} · {s.title}</option>)}</select></div>
  <FormField label="Case title" value={caseTitle} onChange={setCaseTitle} placeholder="Open material challenges block completion"/>
  <FormField label="Requirement" kind="textarea" value={requirement} onChange={setRequirement} placeholder="The contract must never complete an unresolved materially challenged milestone."/>
  <FormField label="Acceptance criteria" kind="textarea" value={criteria} onChange={setCriteria} placeholder="A completed milestone and open material challenge are a contradiction. Missing challenge materiality is inconclusive."/>

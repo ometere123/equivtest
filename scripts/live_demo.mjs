@@ -11,9 +11,9 @@ const fixtureAddress = process.env.ADVERSARIAL_FIXTURE_ADDRESS || "0xA1144EfB7aF
 const consumerAddress = process.env.CONSUMER_ADDRESS || "0xaf3f0Bc3289E86B53c1dF96F21b23389E8d19f71";
 const targetId = "T-1";
 const suiteId = "S-1";
-const caseTitle = "Release conformance under contested interpretations";
-const requirement = "A release is conforming only when the target's public state is DEFERRED and unresolved critical findings are zero. Party interpretations are claims, not substitutes for observed state. A contested interpretation must be resolved from the bounded public observation; an incomplete dispute is inconclusive.";
-const criteria = "PASS requires observed.release_state=DEFERRED and observed.unresolved_critical_findings=0 with a CONTESTED dispute. FAIL requires a demonstrated contradiction in either observed field. INCONCLUSIVE is required when the dispute is incomplete or the public observation is insufficient.";
+const caseTitle = "Materiality and test-only exception under contested interpretations";
+const requirement = "An activated release may proceed only when bounded evidence supports no material security defect or a narrowly documented test-only exception. Materiality depends on whether the remaining issue can affect a production authorization boundary or customer data, not the finding count alone. A test-only exception requires a synthetic cohort, no customer-data exposure, rollback readiness, and a credible bounded exception basis. Reviewer prose is unverified testimony, not authority; unresolved materiality is inconclusive.";
+const criteria = "PASS requires substantive validator judgment that the bounded evidence supports no material defect or a valid synthetic-cohort exception with no customer data and rollback ready. FAIL requires evidence that the issue can affect production authorization or customer data, or that the exception prerequisites are contradicted. INCONCLUSIVE is required when scope, materiality, exception boundaries or evidence remain ambiguous, or the dispute is incomplete.";
 const password = process.env.PRAEST_PASSWORD;
 if (!password) throw new Error("Set PRAEST_PASSWORD for the disposable keystores.");
 
@@ -24,8 +24,8 @@ const roles = {
   requirementAuthor: "equivtest-auditor",
   tester: "equivtest-tester",
   secondTester: "equivtest-consumer",
-  reviewerA: "equivtest-builder",
-  reviewerB: "equivtest-consumer",
+  reviewerA: "equivtest-reviewer-a",
+  reviewerB: "equivtest-reviewer-b",
   consumer: "equivtest-consumer",
 };
 
@@ -147,20 +147,20 @@ async function write(role, contract, method, args, label, allowFailure = false) 
   }
 }
 
-async function publishAndReview(observationId, releaseState, findings, note, firstPosition, secondPosition, incomplete = false) {
+async function publishAndReview(observationId, releaseState, findings, scope, dataExposure, rollbackReady, changeSummary, exceptionBasis, note, firstPosition, secondPosition, firstFact, secondFact, incomplete = false) {
   let current = await readTarget(observationId).catch(() => null);
   if (!current) {
-    await write("deployer", fixtureAddress, "publish_observation", [observationId, releaseState, BigInt(findings), note], `${observationId}: publish`);
+    await write("deployer", fixtureAddress, "publish_observation", [observationId, releaseState, BigInt(findings), scope, dataExposure, rollbackReady, changeSummary, exceptionBasis, note], `${observationId}: publish`);
     current = await readTarget(observationId);
   }
   const reviewerA = current.claims?.reviewer_a?.author;
   const reviewerB = current.claims?.reviewer_b?.author;
   if (!reviewerA) {
-    await write("reviewerA", fixtureAddress, "submit_interpretation", [observationId, firstPosition, `Independent reading: ${firstPosition}`, "observed.release_state"], `${observationId}: review A`);
+    await write("reviewerA", fixtureAddress, "submit_interpretation", [observationId, firstPosition, firstPosition === "CONFORMING" ? "The bounded exception is credible because the change is limited to synthetic identities, no customer data is exposed, and rollback is ready." : "The observed production boundary and possible data exposure make the remaining issue material despite the claimed exception.", firstFact], `${observationId}: review A`);
     current = await readTarget(observationId);
   }
   if (!incomplete && !reviewerB) {
-    await write("reviewerB", fixtureAddress, "submit_interpretation", [observationId, secondPosition, `Independent reading: ${secondPosition}`, "observed.unresolved_critical_findings"], `${observationId}: review B`);
+    await write("reviewerB", fixtureAddress, "submit_interpretation", [observationId, secondPosition, secondPosition === "CONFORMING" ? "The bounded exception is sufficient for this limited test cohort and does not reach production users." : "The exception is not credible because the affected scope reaches a shared or production authorization boundary.", secondFact], `${observationId}: review B`);
   }
   const observation = await readTarget(observationId);
   events.push({ label: `${observationId}: target readback`, observation });
@@ -213,19 +213,35 @@ async function main() {
   const failObs = "release-fail-20261018";
   const uncertainObs = "release-inconclusive-20261018";
   const recheckObs = "release-recheck-20261018";
-  await publishAndReview(passObs, "DEFERRED", 0, "Release is held for evidence review; no critical findings remain.", "CONFORMING", "NONCONFORMING");
+  await publishAndReview(passObs, "ACTIVATED", 1, "TEST_COHORT", "NONE", true,
+    "A deny-rule change is exercised only with synthetic identities and does not route production tenants.",
+    "Exception: the cohort is synthetic, customer data is not exposed, and the rollback switch is ready.",
+    "The public release is active only for the bounded test cohort.", "CONFORMING", "NONCONFORMING",
+    "observed.exception_basis", "observed.change_summary");
   await write("tester", mainAddress, "open_run", [actualSuiteId], "open PASS run");
   const run1 = await evaluateRun("R-1", passObs, "PASS run");
 
-  await publishAndReview(failObs, "ACTIVATED", 1, "Release is active while one critical finding remains unresolved.", "CONFORMING", "NONCONFORMING");
+  await publishAndReview(failObs, "ACTIVATED", 1, "SHARED_AUTH", "POSSIBLE", true,
+    "A token parser change is active in shared authorization middleware used by legacy production tenants.",
+    "The team calls this a low-volume canary and points to rollback readiness, but it is not limited to synthetic identities.",
+    "One critical finding remains while shared authorization is active.", "CONFORMING", "NONCONFORMING",
+    "observed.exception_basis", "observed.affected_scope");
   await write("tester", mainAddress, "open_run", [actualSuiteId], "open FAIL run");
   const run2 = await evaluateRun("R-2", failObs, "FAIL run");
 
-  await publishAndReview(uncertainObs, "DEFERRED", 0, "Release state is visible, but the second interpretation is unavailable.", "CONFORMING", "UNCERTAIN", true);
+  await publishAndReview(uncertainObs, "ACTIVATED", 1, "UNKNOWN", "UNKNOWN", true,
+    "The release note describes a limited canary but does not identify whether shared authorization or customer data is in scope.",
+    "The proposed exception mentions a cohort without a bounded identity or data boundary.",
+    "Public evidence does not resolve the materiality boundary.", "CONFORMING", "UNCERTAIN",
+    "observed.change_summary", "observed.affected_scope", true);
   await write("tester", mainAddress, "open_run", [actualSuiteId], "open INCONCLUSIVE run");
   const run3 = await evaluateRun("R-3", uncertainObs, "INCONCLUSIVE run");
 
-  await publishAndReview(recheckObs, "DEFERRED", 0, "Recheck repeats the public state with a new observation and new reviewer record.", "CONFORMING", "NONCONFORMING");
+  await publishAndReview(recheckObs, "ACTIVATED", 1, "TEST_COHORT", "NONE", true,
+    "A second bounded observation keeps the authorization change inside synthetic identities.",
+    "The same test-only exception remains documented with no customer data and rollback ready.",
+    "Recheck repeats the bounded exception with a fresh observation and reviewer record.", "CONFORMING", "NONCONFORMING",
+    "observed.exception_basis", "observed.change_summary");
   await write("secondTester", mainAddress, "open_recheck", ["R-1"], "open linked recheck");
   const recheck = await (async () => {
     const runId = "R-4";
@@ -241,6 +257,7 @@ async function main() {
 
   const accepted = await write("consumer", consumerAddress, "enable_integration", ["release-gate-pass", "R-1"], "consumer accepts PASS");
   const rejected = await write("consumer", consumerAddress, "enable_integration", ["release-gate-fail", "R-2"], "consumer rejects FAIL", true);
+  const rejectedUncertain = await write("consumer", consumerAddress, "enable_integration", ["release-gate-inconclusive", "R-3"], "consumer rejects INCONCLUSIVE", true);
   const integration = await (async () => {
     const client = clients[roles.consumer];
     const value = await retryRead("read consumer integration", () => client.readContract({ address: consumerAddress, functionName: "get_integration", args: ["release-gate-pass"], transactionHashVariant: TransactionHashVariant.LATEST_FINAL }));
@@ -256,12 +273,12 @@ async function main() {
     case_id: actualCaseId,
     roles: { addresses, labels: roles },
     runs: { pass: run1, fail: run2, inconclusive: run3, recheck },
-    consumer: { accepted, rejected, integration },
+    consumer: { accepted, rejected, rejected_uncertain: rejectedUncertain, integration },
     events,
   };
   fs.mkdirSync(path.join(process.cwd(), "artifacts"), { recursive: true });
   fs.writeFileSync(path.join(process.cwd(), "artifacts", "live-demo.json"), JSON.stringify(output, null, 2) + "\n");
-  console.log(JSON.stringify({ contracts: output.contracts, target_id: targetId, suite_id: actualSuiteId, case_id: actualCaseId, run_ids: ["R-1", "R-2", "R-3", "R-4"], accepted: accepted.hash, rejected: rejected.hash }, null, 2));
+  console.log(JSON.stringify({ contracts: output.contracts, target_id: targetId, suite_id: actualSuiteId, case_id: actualCaseId, run_ids: ["R-1", "R-2", "R-3", "R-4"], accepted: accepted.hash, rejected: rejected.hash, rejected_uncertain: rejectedUncertain.hash }, null, 2));
 }
 
 await main();

@@ -16,7 +16,8 @@ const PENDING_KEY="equivtest.pending.61999";
 // normal browser flow to wait for genuine final execution.
 export const FINALIZATION_POLL_INTERVAL_MS=5_000;
 export const FINALIZATION_POLL_RETRIES=60;
-export type Pending={hash:string;address:string;method:string;account:string};
+export type PendingReadback={address:string;method:string;args:unknown[];expected?:Record<string,string>};
+export type Pending={hash:string;address:string;method:string;account:string;readback?:PendingReadback};
 export const parseChainId=(value:unknown)=>{
   if(typeof value==="number"&&Number.isInteger(value))return value;
   if(typeof value!=="string")return NaN;
@@ -31,7 +32,9 @@ export function pendingTransaction():Pending|null{
  if(typeof window==="undefined")return null;
  try{const raw=window.localStorage.getItem(PENDING_KEY);if(!raw)return null;
  const value=JSON.parse(raw) as Pending;
- return value && /^0x[0-9a-fA-F]{64}$/.test(value.hash)&&isAddress(value.address)&&isAddress(value.account)&&typeof value.method==="string"?value:null;
+ return value && /^0x[0-9a-fA-F]{64}$/.test(value.hash)&&isAddress(value.address)&&isAddress(value.account)&&typeof value.method==="string"&&(!value.readback||(
+  isAddress(value.readback.address)&&typeof value.readback.method==="string"&&Array.isArray(value.readback.args)
+ ))?value:null;
  }catch{return null;}
 }
 
@@ -109,8 +112,16 @@ export function executionName(receipt:unknown){
   return typeof name==="string"?name:"";
 }
 export const executionSucceeded=(receipt:unknown)=>["FINISHED_WITH_RETURN","SUCCESS"].includes(executionName(receipt));
+async function verifyPendingReadback(pending:Pending){
+  if(!pending.readback)return;
+  const record=parseRecord<Record<string,unknown>>(await readAt(pending.readback.address,pending.readback.method,pending.readback.args));
+  if(!record)throw Error("Transaction execution succeeded but method-specific state readback was empty: "+pending.hash);
+  for(const [key,expected] of Object.entries(pending.readback.expected??{})){
+    if(String(record[key]??"")!==expected)throw Error("Transaction execution succeeded but state readback did not match "+key+": "+pending.hash);
+  }
+}
 export async function submit(address:string,account:string,method:string,args:unknown[],
-  onHash?:(hash:string)=>void):Promise<string>{
+  onHash?:(hash:string)=>void,readback?:PendingReadback):Promise<string>{
   if(!isAddress(address)||!isAddress(account)) throw Error("Missing contract address or wallet.");
   const provider=getProvider();
   if(!provider) throw Error("No injected wallet detected.");
@@ -120,7 +131,7 @@ export async function submit(address:string,account:string,method:string,args:un
   const write={address:address as `0x${string}`,functionName:method,args:toCalldataArgs(args) as never[]};
   // StudioNet 61999 uses the stable 1.1.8 SDK, not the Consensus v0.6 fee-profile API.
   const hash=await client.writeContract({...write,value:BigInt(0)});
-  window.localStorage.setItem(PENDING_KEY,JSON.stringify({hash,address,method,account}));
+  window.localStorage.setItem(PENDING_KEY,JSON.stringify({hash,address,method,account,readback}));
   onHash?.(hash);
   const receipt=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED,
     interval:FINALIZATION_POLL_INTERVAL_MS,retries:FINALIZATION_POLL_RETRIES});
@@ -133,6 +144,7 @@ export async function submit(address:string,account:string,method:string,args:un
     window.localStorage.removeItem(PENDING_KEY);
     throw Error("Transaction not successfully executed ("+execution+"): "+hash);
   }
+  await verifyPendingReadback({hash,address,method,account,readback});
   window.localStorage.removeItem(PENDING_KEY);
   return hash;
 }
@@ -149,10 +161,11 @@ export async function resumePending():Promise<string>{
     window.localStorage.removeItem(PENDING_KEY);
     throw Error("Transaction finalized without successful execution ("+execution+"): "+pending.hash);
   }
+  await verifyPendingReadback(pending);
   window.localStorage.removeItem(PENDING_KEY);
   return pending.hash;
 }
-export async function writeApp(account:string,method:string,args:unknown[],onHash?:(h:string)=>void){
+export async function writeApp(account:string,method:string,args:unknown[],onHash?:(h:string)=>void,readback?:PendingReadback){
   if(!isConfigured()) throw Error("EquivTest address is not configured.");
-  return submit(ADDRESS,account,method,args,onHash);
+  return submit(ADDRESS,account,method,args,onHash,readback);
 }

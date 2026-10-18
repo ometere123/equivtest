@@ -1,6 +1,6 @@
 "use client";
 import {useCallback,useEffect,useId,useState} from "react";
-import {readRecord,writeApp,submit} from "@/lib/genlayer";
+import {ADDRESS,PendingReadback,readRecord,submit,writeApp} from "@/lib/genlayer";
 import {useWallet} from "@/components/WalletProvider";
 import {explorerTx,presentError,Counts} from "@/lib/schema";
 import {CheckCircle2,ExternalLink,Loader2,RefreshCw} from "lucide-react";
@@ -16,10 +16,19 @@ export function FormField({label,value,onChange,placeholder,kind="text",required
 }
 export function useMutation(){
  const {account}=useWallet(); const [busy,setBusy]=useState(false);const [error,setError]=useState("");const [hash,setHash]=useState("");const [done,setDone]=useState("");
+ const readbackFor=useCallback((method:string,args:unknown[],targetAddress?:string):PendingReadback|undefined=>{
+   if(targetAddress&&(method==="publish_observation"||method==="submit_interpretation"))return {address:targetAddress,method:"get_equivtest_case",args:[args[0]],expected:{observation_id:String(args[0])}};
+   if(targetAddress)return undefined;
+   if(method==="capture_case")return {address:ADDRESS,method:"get_snapshot",args:[args[0],args[1]],expected:{run_id:String(args[0]),case_id:String(args[1])}};
+   if(method==="evaluate_case")return {address:ADDRESS,method:"get_verdict",args:[args[0],args[1]],expected:{run_id:String(args[0]),case_id:String(args[1])}};
+   if(method==="close_run")return {address:ADDRESS,method:"get_run",args:[args[0]],expected:{id:String(args[0]),state:"CLOSED"}};
+   if(method==="freeze_suite")return {address:ADDRESS,method:"get_suite",args:[args[0]],expected:{id:String(args[0]),frozen:"true"}};
+   return {address:ADDRESS,method:"get_counts",args:[]};
+ },[]);
  const run=useCallback(async(method:string,args:unknown[],targetAddress?:string)=>{
    if(!account){setError("Connect your EIP-1193 wallet first.");return false;}
    setBusy(true);setError("");setDone("");setHash("");
-   try{const h=targetAddress?await submit(targetAddress,account,method,args,setHash):await writeApp(account,method,args,setHash);
+   try{const readback=readbackFor(method,args,targetAddress);const h=targetAddress?await submit(targetAddress,account,method,args,setHash,readback):await writeApp(account,method,args,setHash,readback);
      setDone(method+" executed successfully. Finalized transaction: "+h);return true;
    }catch(e){setError(presentError(e));return false;}finally{setBusy(false);}
  },[account]);
