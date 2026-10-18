@@ -4,8 +4,7 @@
   "repository": "https://github.com/ometere123/equivtest",
   "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
   "verifiedSourceCommit": "7296d8a0af4b9263630216b794a82657962a4dcb",
-  "finalRepositorySha": "PENDING_FINAL_DOCUMENTATION_COMMIT",
-  "verifiedCiRun": "PENDING_FINAL_PUSH_CI",
+  "verifiedCiRun": "https://github.com/ometere123/equivtest/actions/runs/39159854183",
   "network": {
     "name": "GenLayer StudioNet",
     "chainId": 61999,
