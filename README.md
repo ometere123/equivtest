@@ -153,9 +153,9 @@ Push-Location frontend; $env:CI = '1'; npx playwright test; Pop-Location
 npm audit --prefix frontend --omit=dev --audit-level=high
 ```
 
-Verified results at the final application source commit are 14 state tests, 8 Direct Mode tests, 4 contract lints, 7 frontend unit tests, 4 Playwright desktop/mobile tests, a successful production build generating all seven routes, and zero production dependency vulnerabilities. The development tree still reports 10 audit findings whose automatic fixes require breaking Vitest 5 and Tailwind 4 upgrades; they are listed as a limitation rather than silently upgraded out of the locked stack.
+Verified results at the corrected application source are 16 state/adversarial tests, 8 Direct Mode tests, 4 contract lints, 8 frontend unit tests, 4 Playwright desktop/mobile tests, a successful production build generating all seven product routes, and zero frontend audit findings at the high severity threshold.
 
-Direct Mode is genuine local GenVM execution with `genlayer-test==0.29.2`; it is not StudioNet evidence. StudioNet evidence is separately recorded in `docs/live-demo-20261018.json` and the deployment manifest.
+Direct Mode is genuine local GenVM execution with `genlayer-test==0.29.2`; it is not StudioNet evidence. StudioNet evidence is separately recorded in `docs/live-demo-20261019.json` and the deployment manifest.
 
 ## Live StudioNet evidence
 
@@ -163,14 +163,14 @@ Final deployments are on StudioNet 61999 and were source-parity checked with `ge
 
 | Contract | Address | Deployment transaction |
 | --- | --- | --- |
-| EquivTest | `0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE` | [`0x3dd6d1…`](https://explorer-studio.genlayer.com/tx/0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742) |
-| Adversarial release fixture | `0xA1144EfB7aFae409210b84e9Cbeb91C2AbC8c145` | [`0x91f38a…`](https://explorer-studio.genlayer.com/tx/0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487) |
-| Conformance consumer | `0xaf3f0Bc3289E86B53c1dF96F21b23389E8d19f71` | [`0xcb2ee8…`](https://explorer-studio.genlayer.com/tx/0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca) |
+| EquivTest | `0x7E058b6dCfa30c28912604589C7D4DA8073d9390` | [`0x057953…`](https://explorer-studio.genlayer.com/tx/0x057953d237299132d7f268a0a24d061e332a7b0e8fd77e408ac1c292b32baa1e) |
+| Adversarial release fixture | `0x9956d55C5cE4eA04293A6EB15B8EeB5F363E5068` | [`0x47cad0…`](https://explorer-studio.genlayer.com/tx/0x47cad002863cf66db0b63cc1d1406d0426476c6017da25c6da11492cb1f1ed07) |
+| Conformance consumer | `0x4dD69af3827363bd415c9e055b3D59c1B56A8d56` | [`0x57bd0b…`](https://explorer-studio.genlayer.com/tx/0x57bd0b9ff9e44b03c7f2f56b5ac30d7c986a8c301e912010b2f16726eb2a6d4c) |
 | Milestone fixture | `0xe54ccca25ae4ACE1D484aF341adEf29C9b5feB10` | [`0x62f217…`](https://explorer-studio.genlayer.com/tx/0x62f217afc0eb0ccec9df86b2c33377cb98f94486cd687467c34d5bfc37954125) |
 
-All four deployment transactions finalized with consensus agreement and execution success. The retrieved deployed bytes matched the intended local source byte-for-byte. The exact hashes, byte lengths, full interaction ledger, five disposable wallet roles, and readbacks are in [`docs/deployment-manifest.json`](docs/deployment-manifest.json), [`docs/source-parity-20261018.json`](docs/source-parity-20261018.json), and [`docs/live-demo-20261018.json`](docs/live-demo-20261018.json).
+All four deployment transactions finalized with consensus agreement and execution success. The retrieved deployed bytes matched the intended local source byte-for-byte. The exact hashes, byte lengths, seven disposable wallet roles, full interaction ledger and readbacks are in [`docs/deployment-manifest.json`](docs/deployment-manifest.json), [`docs/source-parity-20261019.json`](docs/source-parity-20261019.json), and [`docs/live-demo-20261019.json`](docs/live-demo-20261019.json).
 
-The live demonstration recorded target `T-1`, frozen suite `S-1`, and runs R-1 PASS, R-2 FAIL, R-3 INCONCLUSIVE, and R-4 PASS linked to R-1. The consumer enabled `release-gate-pass` for R-1 and rejected `release-gate-fail` for R-2; the rejection finalized with execution error and did not mutate successful consumer state.
+The live demonstration recorded target `T-1`, frozen suite `S-1`, and runs R-1 PASS, R-2 FAIL, R-3 INCONCLUSIVE, and R-4 PASS linked to R-1. The consumer enabled `release-gate-pass` for R-1 and rejected both `release-gate-fail` and `release-gate-inconclusive`; both rejection transactions finalized with execution error and did not mutate successful consumer state.
 
 ## Browser use and recovery
 
@@ -178,10 +178,10 @@ Install or unlock an injected EIP-1193 wallet, switch it to StudioNet 61999, and
 
 ## Deployment and CI
 
-The production frontend is manually deployed at [https://equivtest.vercel.app](https://equivtest.vercel.app) with public chain ID `61999`, RPC `https://studio.genlayer.com/api`, and the final EquivTest address. Vercel project Git integration remains disabled; no GitHub push deployment is used. The final deployment identifier and route checks are recorded in the manifest.
+The production frontend is manually deployed at [https://equivtest.vercel.app](https://equivtest.vercel.app) with public chain ID `61999`, RPC `https://studio.genlayer.com/api`, and the corrected EquivTest address `0x7E058b6dCfa30c28912604589C7D4DA8073d9390`. Vercel project Git integration remains disabled; no GitHub push deployment is used. The final deployment identifier and route checks are recorded in the manifest.
 
 The GitHub Actions workflow installs the locked root and frontend lockfiles with `npm ci`, checks the CLI version, runs compile/state/Direct Mode tests, lints all four contracts with GenVM `v0.2.12`, audits production dependencies, typechecks, unit-tests, builds, and runs Playwright. It does not deploy.
 
 ## Evidence and limitations
 
-The evidence ledger at [`docs/evidence-ledger.md`](docs/evidence-ledger.md) separates local, Direct Mode, StudioNet, Vercel, and injected-wallet evidence. The only remaining limitations are the development-only dependency audit findings requiring breaking major upgrades, the model/provider dependence inherent to GenLayer consensus, and the fact that a target's public adapter is not an oracle for off-chain truth. No successful certification or browser transaction is claimed without authoritative execution and state readback.
+The evidence ledger at [`docs/evidence-ledger.md`](docs/evidence-ledger.md) separates local, Direct Mode, StudioNet, Vercel, and injected-wallet evidence. Remaining limitations are the model/provider dependence inherent to GenLayer consensus, the fact that a target's public adapter is not an oracle for off-chain truth, and the explicit scope of wallet separation. No successful certification or browser transaction is claimed without authoritative execution and state readback.

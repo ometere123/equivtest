@@ -1,10 +1,9 @@
 {
   "status": "DEPLOYED_AND_VERIFIED",
-  "observedAt": "2026-10-18",
+  "observedAt": "2026-10-19",
   "repository": "https://github.com/ometere123/equivtest",
-  "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
-  "verifiedSourceCommit": "04cdccaddc95b459cc2c0a9701352b4041a65ab5",
-  "verifiedCiRun": "https://github.com/ometere123/equivtest/actions/runs/39169528494",
+  "sourceBaseline": "209d3a3a63602637df83c07c67765b2f010abdb8",
+  "verifiedSourceCommit": "aded9cd",
   "network": {
     "name": "GenLayer StudioNet",
     "chainId": 61999,
@@ -20,15 +19,15 @@
   },
   "intendedSources": {
     "contracts/equivtest.py": {
-      "sha256": "66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb",
-      "bytes": 27971
+      "sha256": "b14a9b098e0ad5c17ae0f9e8e90ef57e16f7661341d86f3047d411781fb83450",
+      "bytes": 33585
     },
     "contracts/fixture_adversarial.py": {
-      "sha256": "6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41",
-      "bytes": 5378
+      "sha256": "1183f114315ab44053ace9e0310215ae03b50fef2329e40a926e7cb330c46b88",
+      "bytes": 7612
     },
     "contracts/fixture_consumer.py": {
-      "sha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc7176cd6eb8",
+      "sha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc71c76cd6eb8",
       "bytes": 2049
     },
     "contracts/fixture_milestone.py": {
@@ -38,36 +37,36 @@
   },
   "deployments": {
     "equivtest": {
-      "address": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE",
-      "deploymentTx": "0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742",
-      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742",
+      "address": "0x7E058b6dCfa30c28912604589C7D4DA8073d9390",
+      "deploymentTx": "0x057953d237299132d7f268a0a24d061e332a7b0e8fd77e408ac1c292b32baa1e",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x057953d237299132d7f268a0a24d061e332a7b0e8fd77e408ac1c292b32baa1e",
       "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-      "localBytes": 27971,
-      "deployedBytes": 27971,
-      "sourceSha256": "66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb",
+      "localBytes": 33585,
+      "deployedBytes": 33585,
+      "sourceSha256": "b14a9b098e0ad5c17ae0f9e8e90ef57e16f7661341d86f3047d411781fb83450",
       "sourceParity": "EXACT"
     },
     "fixtureAdversarial": {
-      "address": "0xA1144EfB7aFae409210b84e9Cbeb91C2AbC8c145",
-      "deploymentTx": "0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487",
-      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487",
+      "address": "0x9956d55C5cE4eA04293A6EB15B8EeB5F363E5068",
+      "deploymentTx": "0x47cad002863cf66db0b63cc1d1406d0426476c6017da25c6da11492cb1f1ed07",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x47cad002863cf66db0b63cc1d1406d0426476c6017da25c6da11492cb1f1ed07",
       "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-      "localBytes": 5378,
-      "deployedBytes": 5378,
-      "sourceSha256": "6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41",
+      "localBytes": 7612,
+      "deployedBytes": 7612,
+      "sourceSha256": "1183f114315ab44053ace9e0310215ae03b50fef2329e40a926e7cb330c46b88",
       "sourceParity": "EXACT"
     },
     "fixtureConsumer": {
-      "address": "0xaf3f0Bc3289E86B53c1dF96F21b23389E8d19f71",
-      "deploymentTx": "0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca",
-      "explorerTx": "https://explorer-studio.genlayer.com/tx/0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca",
+      "address": "0x4dD69af3827363bd415c9e055b3D59c1B56A8d56",
+      "deploymentTx": "0x57bd0b9ff9e44b03c7f2f56b5ac30d7c986a8c301e912010b2f16726eb2a6d4c",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x57bd0b9ff9e44b03c7f2f56b5ac30d7c986a8c301e912010b2f16726eb2a6d4c",
       "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
       "localBytes": 2049,
       "deployedBytes": 2049,
-      "sourceSha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc7176cd6eb8",
+      "sourceSha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc71c76cd6eb8",
       "sourceParity": "EXACT",
       "constructorBinding": {
-        "registry": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE",
+        "registry": "0x7E058b6dCfa30c28912604589C7D4DA8073d9390",
         "suiteId": "S-1",
         "targetId": "T-1"
       }
@@ -85,78 +84,71 @@
   },
   "sourceParity": {
     "method": "GenLayerJS 1.1.8 getContractCode raw byte comparison",
-    "artifact": "docs/source-parity-20261018.json",
+    "artifact": "docs/source-parity-20261019.json",
     "allExact": true,
-    "verifiedBytes": "Each retrieved deployed byte sequence matched the intended local source byte-for-byte."
+    "verifiedBytes": "Every retrieved deployed byte sequence matched the intended local source byte-for-byte."
   },
   "liveDemonstration": {
-    "artifact": "docs/live-demo-20261018.json",
-    "roles": {
-      "deployer": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
-      "suiteBuilder": "0xcAE3bF2755E18448aA5Bb15d632815deb7780F18",
-      "auditor": "0x3161ad2Ce7e22AF8D7e751D97a1cd5205706FDA2",
-      "tester": "0x8686F3c2434cAF7Ff9aDB5fCACaCE67B7B987eB7",
-      "consumer": "0xA35d8B9aDBb548C27638e13957F52e4a893d29fd"
-    },
+    "artifact": "docs/live-demo-20261019.json",
     "targetId": "T-1",
     "suiteId": "S-1",
     "caseId": "C-1",
-    "suiteDigest": "61b55e8102e96134cfd8798efcf03edbf4beae324361e5cbe1d1db455f7f7b9f",
+    "suiteDigest": "15643abff8bb27b8c4221fefe130a0102cdeb212f6658fdf4c21e2cf122c26c8",
     "runs": {
-      "R-1": {"outcome": "PASS", "certified": true, "evidenceDigest": "c68e1f79cafb5ebf332b0997b9666a1ce52c832cbf63d3aad952b6074202ab6f"},
-      "R-2": {"outcome": "FAIL", "certified": false, "evidenceDigest": "f80e3a8ef680b08aebdff6c5b2b9d83a843aa36ca6352359abb31ff6db898e46"},
-      "R-3": {"outcome": "INCONCLUSIVE", "certified": false, "evidenceDigest": "a588f6e6dbea1bd3061682e9d41b2d52eb5a5a1cdff2416f5cd99e892fc38802"},
-      "R-4": {"outcome": "PASS", "certified": true, "recheckOf": "R-1", "evidenceDigest": "f4c8d66a1c375a9c37cb2363bab585a8398321bc53cd2f0b7c66b93700602b6a"}
+      "R-1": {"outcome": "PASS", "certified": true, "recheckOf": ""},
+      "R-2": {"outcome": "FAIL", "certified": false, "recheckOf": ""},
+      "R-3": {"outcome": "INCONCLUSIVE", "certified": false, "recheckOf": ""},
+      "R-4": {"outcome": "PASS", "certified": true, "recheckOf": "R-1"}
     },
     "consumer": {
       "acceptedRun": "R-1",
-      "acceptedTx": "0xf103a2c4b65b3c401c7f321cac3b4f4ffb79a81149e7f4519c39f4f7f84fe526",
+      "acceptedTx": "0xdf6bc0fd8ba5d6abec7657ca8f7830759f553e454b89a4b3d787eef5ed0cb70a",
       "rejectedRun": "R-2",
-      "rejectedTx": "0x92fac74718302aa842cdfc8e4550a165ba7e74f2732469f79fcf3a5df13d5cd8",
+      "rejectedTx": "0x2dafd2fa2b4c077972287c350e7b2fed70ae37f40c009ee1d26b048eaee65fbe",
+      "rejectedUncertainRun": "R-3",
+      "rejectedUncertainTx": "0x4ad64c34bcf2a6ed06ba4eaae935cccbb79e741c9dbf85d18f4ab205c47c3e13",
       "rejectedExecution": "FINALIZED / MAJORITY_AGREE / ERROR",
       "acceptedState": "release-gate-pass enabled",
-      "rejectedState": "no successful release-gate-fail mutation"
+      "rejectedState": "no successful release-gate-fail or release-gate-inconclusive mutation"
     }
   },
   "frontend": {
     "project": "equivtest",
     "productionUrl": "https://equivtest.vercel.app",
-    "deploymentUrl": "https://equivtest-38uyinnjw-delealufejoel-4184s-projects.vercel.app",
-    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/72X5ziZK59UsXAiGJpV7FkHodbos",
-    "status": "READY",
-    "sourceCommit": "04cdccaddc95b459cc2c0a9701352b4041a65ab5",
-    "deploymentId": "dpl_72X5ziZK59UsXAiGJpV7FkHodbos",
-    "deploymentHistory": [
-      {"id": "dpl_CNNrvfMEAaJ1me9jhrM493aY7MmY", "sourceCommit": "aa249b48d99325ea068f754a70c837b7685364d2", "purpose": "Initial final manual deployment; superseded after receipt-shape verification found nested execution results."},
-      {"id": "dpl_ERWJWwxKvRQk8GHDcjf8ygUQqDG7", "sourceCommit": "7296d8a0af4b9263630216b794a82657962a4dcb", "purpose": "Corrective final manual deployment with nested StudioNet receipt parsing."},
-      {"id": "dpl_72X5ziZK59UsXAiGJpV7FkHodbos", "sourceCommit": "04cdccaddc95b459cc2c0a9701352b4041a65ab5", "purpose": "Manual production deployment extending StudioNet finalization polling to five minutes and preserving interrupted-session recovery."}
-    ],
+    "status": "PENDING_FINAL_MANUAL_DEPLOYMENT",
     "manualDeployment": true,
     "automaticGitDeployments": false,
     "publicEnvironment": {
       "chainId": 61999,
       "rpc": "https://studio.genlayer.com/api",
-      "equivtestAddress": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE"
+      "equivtestAddress": "0x7E058b6dCfa30c28912604589C7D4DA8073d9390"
     },
     "routes": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"],
-    "routeCheckResult": "All seven production routes returned HTTP 200 after deployment dpl_72X5ziZK59UsXAiGJpV7FkHodbos.",
-    "finalizationPolling": {"intervalMs": 5000, "retries": 60, "maximumWaitMs": 300000, "appliesTo": ["submit", "resumePending"]}
+    "finalizationPolling": {
+      "intervalMs": 5000,
+      "retries": 60,
+      "maximumWaitMs": 300000,
+      "appliesTo": ["submit", "resumePending"]
+    }
   },
   "adversarialFindings": [
     {
-      "finding": "Older consumer deployment failed in GenVM because two differently typed TreeMaps were serialized under one contract state.",
-      "resolution": "Replaced them with one typed records map; added Direct Mode constructor/storage regression coverage; final consumer deployment is successful.",
-      "notFinalEvidence": true
+      "finding": "The first corrected live evaluation exposed that a model could omit the required reviewer-A rationale citation.",
+      "resolution": "The evaluator and validator instructions now require the exact canonical reviewer-A and reviewer-B interpretation paths, both dispute positions and materiality observations. The failed transaction finalized with MAJORITY_DISAGREE / ERROR and wrote no verdict.",
+      "evidence": "docs/live-demo-20261019.json validatorFailureEvidence"
     },
     {
-      "finding": "Earlier browser build encoded Python Address arguments as plain strings and the first final build did not read nested StudioNet execution results.",
-      "resolution": "Recursive CalldataAddress encoding, authoritative SUCCESS/FINISHED_WITH_RETURN checks, nested leader-receipt parsing, and readback gating were added before the corrective final manual deployment.",
-      "notFinalEvidence": false
+      "finding": "The browser's first finalization wait expired before StudioNet exposed the finalized result.",
+      "resolution": "The frontend now polls for five minutes, keeps the hash in local recovery storage, distinguishes FINALIZED from execution SUCCESS, and requires method-specific state readback. Existing browser recovery evidence is preserved in the live artifact."
+    },
+    {
+      "finding": "Development dependency audit findings were previously actionable only through incompatible major upgrades.",
+      "resolution": "The compatible Vitest 5 / Tailwind 4 stack and lockfiles are now installed and audited with zero findings at audit level high."
     }
   ],
   "limitations": [
-    "GenLayer consensus remains dependent on the configured leader/validator/model execution.",
-    "A target public adapter is not an oracle for external reality.",
-    "Frontend development dependencies retain 10 audit findings whose automatic fixes require breaking Vitest 5 and Tailwind 4 upgrades; production dependencies report zero vulnerabilities."
+    "GenLayer consensus and model/provider availability remain external runtime dependencies.",
+    "The target public adapter is bounded on-chain evidence, not an oracle for off-chain reality; wallet separation proves only on-chain role separation, not real-world authority.",
+    "The browser-signed Computer Use evidence is from the prior production deployment and is explicitly not substituted for the corrected contract's current CLI-backed StudioNet lifecycle."
   ]
 }

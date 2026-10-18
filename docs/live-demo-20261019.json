@@ -1,0 +1,153 @@
+{
+  "evidenceType": "StudioNet live lifecycle readback",
+  "observedAtUtc": "2026-10-18T23:44:51Z",
+  "network": {
+    "name": "GenLayer StudioNet",
+    "chainId": 61999,
+    "rpc": "https://studio.genlayer.com/api"
+  },
+  "contracts": {
+    "equivtest": "0x7E058b6dCfa30c28912604589C7D4DA8073d9390",
+    "adversarialFixture": "0x9956d55C5cE4eA04293A6EB15B8EeB5F363E5068",
+    "consumer": "0x4dD69af3827363bd415c9e055b3D59c1B56A8d56"
+  },
+  "roles": {
+    "deployer": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+    "suiteBuilder": "0xcae3bf2755e18448aa5bb15d632815deb7780f18",
+    "requirementAuthor": "0x3161ad2ce7e22af8d7e751d97a1cd5205706fda2",
+    "tester": "0x8686f3c2434caf7ff9adb5fcacace67b7b987eb7",
+    "reviewerA": "0x92fbae8b6baf507caf60d142a46c44d9dd81dfcb",
+    "reviewerB": "0xd698ed941cee7a00bfaa4a43010d165e6f22b41b",
+    "recheckTesterAndConsumer": "0xa35d8b9adbb548c27638e13957f52e4a893d29fd"
+  },
+  "bindings": {
+    "targetId": "T-1",
+    "suiteId": "S-1",
+    "caseId": "C-1",
+    "targetVersion": "fixture-adversarial-2",
+    "suiteDigest": "15643abff8bb27b8c4221fefe130a0102cdeb212f6658fdf4c21e2cf122c26c8",
+    "targetReadback": {
+      "address": "0x9956d55c5ce4ea04293a6eb15b8eeb5f363e5068",
+      "registrant": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+      "version": "fixture-adversarial-2"
+    },
+    "suiteReadback": {
+      "frozen": true,
+      "owner": "0xcae3bf2755e18448aa5bb15d632815deb7780f18",
+      "requirementAuthor": "0x3161ad2ce7e22af8d7e751d97a1cd5205706fda2",
+      "caseIds": ["C-1"]
+    }
+  },
+  "semanticDispute": {
+    "requirement": "An activated release may proceed only when bounded evidence supports no material security defect or a narrowly documented test-only exception.",
+    "contestedFacts": [
+      "Reviewer A: the exception is credible for synthetic identities, no customer data and ready rollback.",
+      "Reviewer B: the exception is not credible if the affected scope reaches shared or production authorization."
+    ],
+    "observedProvenance": "TARGET_PUBLIC_VIEW",
+    "walletSeparationOnly": true,
+    "realWorldAuthorityAttested": false
+  },
+  "runs": {
+    "R-1": {
+      "outcome": "PASS",
+      "state": "CLOSED",
+      "certified": true,
+      "evidenceDigest": "f9465ec6c2839e3995da38e08b6253ec4155c46dd7fd695bb3971296039afb32",
+      "reasonCode": "MEETS_REQUIREMENT",
+      "captureTx": "0xe04cb517afc72c4cb278390ec033c9763e8b14bb89cb1679fd7b7a1f51466738",
+      "evaluateTx": "0x30c81012d74c3e40f27151b6ec68606486b33ed5e43234aeed112a0283202551",
+      "closeTx": "0x68ebacaf4aa1bc67c0e98222e18060b324889cb8d891fb6f4adb4f9f8dcd498f"
+    },
+    "R-2": {
+      "outcome": "FAIL",
+      "state": "CLOSED",
+      "certified": false,
+      "evidenceDigest": "8c84e5f0b37c192391904ff48890b38f9a502b2ce4b76a45ab77553d9268657f",
+      "reasonCode": "RULE_CONTRADICTION",
+      "captureTx": "0xe4dca3f8c71dfde79aba0082adee16bd7be0cf4d1d8321a80cc6a81e63943c88",
+      "evaluateTx": "0x21da675316552b9e3898e74d68012afed39d0bef135e4ce1b80132aa1d78ec17",
+      "closeTx": "0xccfdb0e3162e988ccd03e6a098987273639b7325553bbb53b83e8b5e9ee706be"
+    },
+    "R-3": {
+      "outcome": "INCONCLUSIVE",
+      "state": "CLOSED",
+      "certified": false,
+      "evidenceDigest": "c9e8988fdd572ab09d3f2a89111c13bc58fe054fe01e719ad6b564d2e32051ec",
+      "reasonCode": "INSUFFICIENT_EVIDENCE",
+      "captureTx": "0xa7aabef5d19594bad1c8a0d69211f955dbf932d84f94dccc5b9ab6a88d7250da",
+      "evaluateTx": "0xf66926c6b59f29b5a435cbe0ef8e140a54a3ecb3f1c6a5c2a396e4564bb1b2e9",
+      "closeTx": "0x55161b0c1a9e888551ede7ec9703223206780811aee92346daaa6a706ca93918"
+    },
+    "R-4": {
+      "outcome": "PASS",
+      "state": "CLOSED",
+      "certified": true,
+      "recheckOf": "R-1",
+      "evidenceDigest": "d47d707019f23c657383f9a312a84fc004974a198494689bd050f20e39465440",
+      "reasonCode": "MEETS_REQUIREMENT",
+      "openRecheckTx": "0x55c15d524be50f03fb2167b97eca1b189c4fcae15ce3a8097c07479f9707c2ce",
+      "captureTx": "0xc33ac1b5c7b5acc98a14d3a57123151672b0dc295f716a339d592dafb4a77464",
+      "evaluateTx": "0xa075b48877a42caaa3a50a29276b352f5363c5323b137aff1409ae268f9cf259",
+      "closeTx": "0xc6afc5a9883a1d55e6554da6b7494c8ac24174ce65e516f9aba8dc4f349d90b8"
+    }
+  },
+  "lifecycleTransactions": [
+    {"label": "register target", "hash": "0xc403c0a4552aa6c9e93de1c5a8e8eb7e552c287f7ffe0f461f35343929ca00b9", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "create suite", "hash": "0xb4853f8b47f0671c502817402524c869fb3749ab93a38af47b0c1f0e11b31ecb", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "add contested case", "hash": "0x2a92208687fd439ce75dc8e0e43a2444e656c9ce610575465b06dfd119593a17", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "freeze suite", "hash": "0x744e7283fc5551e4d641fde6b7ce93e9151305d6ac1ceba59cb1d4f1dc7eafc3", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "open PASS run", "hash": "0xd1abcd8ed2946c7cbbf02dc2949dc57f940b9a312d41959f9213f6687e5445bf", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "open FAIL run", "hash": "0x0e28111927818b6b019abe38a3da4db14ff01bb684ddf56b3d58dd14b2cfdb4e", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "open INCONCLUSIVE run", "hash": "0x75d0ee62d03d7671287c288226de7c397b76c01f0bf8319e9f698439dad5c8c8", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "consumer accepts PASS", "hash": "0xdf6bc0fd8ba5d6abec7657ca8f7830759f553e454b89a4b3d787eef5ed0cb70a", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "SUCCESS"},
+    {"label": "consumer rejects FAIL", "hash": "0x2dafd2fa2b4c077972287c350e7b2fed70ae37f40c009ee1d26b048eaee65fbe", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "ERROR"},
+    {"label": "consumer rejects INCONCLUSIVE", "hash": "0x4ad64c34bcf2a6ed06ba4eaae935cccbb79e741c9dbf85d18f4ab205c47c3e13", "status": "FINALIZED", "consensus": "MAJORITY_AGREE", "execution": "ERROR"}
+  ],
+  "consumerReadback": {
+    "acceptedIntegration": {
+      "id": "release-gate-pass",
+      "runId": "R-1",
+      "suiteId": "S-1",
+      "targetId": "T-1",
+      "enabled": true,
+      "conformanceDigest": "15643abff8bb27b8c4221fefe130a0102cdeb212f6658fdf4c21e2cf122c26c8"
+    },
+    "failIntegration": null,
+    "inconclusiveIntegration": null
+  },
+  "validatorFailureEvidence": {
+    "transaction": "0x1afe5b73c9a4de6ade4d807e2d1d2360a0b9195a71c65e6aef4341c5e494aa8b",
+    "result": "MAJORITY_DISAGREE",
+    "execution": "ERROR",
+    "leaderAndValidatorError": "Missing reviewer A rationale",
+    "stateEffect": "R-1 remained OPEN with no verdict or certification",
+    "explorer": "https://explorer-studio.genlayer.com/tx/0x1afe5b73c9a4de6ade4d807e2d1d2360a0b9195a71c65e6aef4341c5e494aa8b"
+  },
+  "browserWalletEvidence": {
+    "source": "Previously captured Computer Use session on the prior production deployment",
+    "wallet": "0xfcef676044658B5402f590daBe9E04A0F640522f",
+    "oldRegistry": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE",
+    "oldRun": "R-5",
+    "duplicateCapture": {
+      "hash": "0xd21414f71acaa77766a8fb0588a0f120873dc0b970ffb86559314bd5985a808e",
+      "receipt": "FINALIZED / MAJORITY_AGREE / ERROR",
+      "outcome": "Case already captured; no successful state mutation"
+    },
+    "evaluation": {
+      "hash": "0x76fb28009a1d6cd3e34e511ee6d2df95614bd07690b9275b222d144461354eaa",
+      "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+      "outcome": "INCONCLUSIVE; the browser initially timed out while polling, then recovery observed the finalized receipt"
+    },
+    "close": {
+      "hash": "0x319e94f52a711f492b95372a91637767dbfc3d5263088c07fcb9a4307a8c1111",
+      "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+      "outcome": "R-5 closed INCONCLUSIVE"
+    },
+    "uiEvidence": [
+      "Runner showed the pending-finalization/recovery state after the polling timeout.",
+      "Reload plus Resume finalization check cleared the pending transaction only after receipt and state resolution.",
+      "The browser evidence is prior-deployment evidence and is not counted as proof of the corrected contract deployment."
+    ]
+  }
+}
