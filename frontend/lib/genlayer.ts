@@ -11,6 +11,11 @@ export interface EthereumProvider {
 declare global {interface Window {ethereum?:EthereumProvider}}
 export const CHAIN_ID=61999;
 const PENDING_KEY="equivtest.pending.61999";
+// StudioNet consensus can take longer than the GenLayerJS default 30-second
+// receipt window. Keep the submitted hash recoverable while allowing the
+// normal browser flow to wait for genuine final execution.
+export const FINALIZATION_POLL_INTERVAL_MS=5_000;
+export const FINALIZATION_POLL_RETRIES=60;
 export type Pending={hash:string;address:string;method:string;account:string};
 export const parseChainId=(value:unknown)=>{
   if(typeof value==="number"&&Number.isInteger(value))return value;
@@ -117,7 +122,8 @@ export async function submit(address:string,account:string,method:string,args:un
   const hash=await client.writeContract({...write,value:BigInt(0)});
   window.localStorage.setItem(PENDING_KEY,JSON.stringify({hash,address,method,account}));
   onHash?.(hash);
-  const receipt=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});
+  const receipt=await client.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED,
+    interval:FINALIZATION_POLL_INTERVAL_MS,retries:FINALIZATION_POLL_RETRIES});
   // FINALIZED is not equivalent to successful contract execution.
   const execution=executionName(receipt);
   if(!execution) throw Error("Transaction finalized but execution success is unverified. Inspect receipt: "+hash);
@@ -134,7 +140,8 @@ export async function resumePending():Promise<string>{
   const pending=pendingTransaction();
   if(!pending)throw Error("No pending transaction stored on this device.");
   const receipt=await readClient().waitForTransactionReceipt({
-    hash:pending.hash as never,status:TransactionStatus.FINALIZED
+    hash:pending.hash as never,status:TransactionStatus.FINALIZED,
+    interval:FINALIZATION_POLL_INTERVAL_MS,retries:FINALIZATION_POLL_RETRIES
   });
   const execution=executionName(receipt);
   if(!execution)throw Error("Transaction finalized but execution success is unverified: "+pending.hash);

@@ -26,7 +26,7 @@ export function useMutation(){
  return {run,busy,error,hash,done,clear:()=>{setError("");setDone("");}};
 }
 export function MutationStatus({state}:{state:ReturnType<typeof useMutation>}){
- return <div className="rows" style={{marginTop:12}}>{state.busy&&<div className="note inline"><Loader2 size={14}/> Processing wallet and protocol finalisation…</div>}
+ return <div className="rows" style={{marginTop:12}}>{state.busy&&<div className="note inline"><Loader2 size={14}/> Processing wallet and protocol finalisation… Consensus may take several minutes; keep this tab open. If interrupted, use the recovery banner.</div>}
    <DataMessage value={state.error}/><DataMessage value={state.done} type="success"/>
    {state.hash&&<div className="note code">Transaction: <a href={explorerTx(state.hash)} target="_blank" rel="noreferrer">{state.hash} <ExternalLink size={12} style={{display:"inline"}}/></a></div>}</div>;
 }

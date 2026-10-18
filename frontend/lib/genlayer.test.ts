@@ -1,6 +1,6 @@
 import {describe,it,expect} from "vitest";
 import {CalldataAddress} from "genlayer-js/types";
-import {executionName,executionSucceeded,toCalldataArgs} from "./genlayer";
+import {executionName,executionSucceeded,toCalldataArgs,FINALIZATION_POLL_INTERVAL_MS,FINALIZATION_POLL_RETRIES} from "./genlayer";
 
 describe("GenLayer calldata arguments",()=>{
  it("encodes address strings as GenLayer calldata addresses",()=>{
@@ -25,5 +25,10 @@ describe("GenLayer calldata arguments",()=>{
   expect(executionSucceeded({consensus_data:{leader_receipt:[{execution_result:"ERROR"}]}})).toBe(false);
   expect(executionSucceeded({execution_result:"ERROR"})).toBe(false);
   expect(executionSucceeded({status_name:"FINALIZED"})).toBe(false);
+ });
+ it("uses a consensus-sized finalization window",()=>{
+  expect(FINALIZATION_POLL_INTERVAL_MS).toBe(5000);
+  expect(FINALIZATION_POLL_RETRIES).toBe(60);
+  expect(FINALIZATION_POLL_INTERVAL_MS*FINALIZATION_POLL_RETRIES).toBeGreaterThanOrEqual(180000);
  });
 });
