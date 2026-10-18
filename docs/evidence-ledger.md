@@ -90,7 +90,7 @@ The complete transaction and readback artifact is [`live-demo-20261018.json`](li
 
 ## Frontend and Vercel evidence
 
-The final production deployment is recorded in [`deployment-manifest.json`](deployment-manifest.json). Its public environment is chain 61999, the locked RPC, and the final EquivTest address. The project has no GitHub deployment integration; deployment was performed manually with Vercel CLI once after the final application source commit. Seven route HTTP checks and the public registry readback are recorded there. Injected-wallet browser evidence is recorded separately only after the corrected production deployment is exercised; absence of a wallet provider is not treated as a successful transaction.
+The final production deployment is recorded in [`deployment-manifest.json`](deployment-manifest.json). Its public environment is chain 61999, the locked RPC, and the final EquivTest address. The project has no GitHub deployment integration. Vercel CLI was used manually for the initial final deployment and one necessary corrective redeployment after raw receipt inspection found nested StudioNet execution results; the manifest records both IDs and the reason. Seven route HTTP checks and the public registry readback are recorded there. Injected-wallet browser evidence is recorded separately only after the corrected production deployment is exercised; absence of a wallet provider is not treated as a successful transaction.
 
 ## Remaining limitations
 

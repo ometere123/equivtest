@@ -3,7 +3,7 @@
   "observedAt": "2026-10-18",
   "repository": "https://github.com/ometere123/equivtest",
   "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
-  "verifiedSourceCommit": "aa249b48d99325ea068f754a70c837b7685364d2",
+  "verifiedSourceCommit": "7296d8a0af4b9263630216b794a82657962a4dcb",
   "finalRepositorySha": "PENDING_FINAL_DOCUMENTATION_COMMIT",
   "verifiedCiRun": "PENDING_FINAL_PUSH_CI",
   "network": {
@@ -122,11 +122,15 @@
   "frontend": {
     "project": "equivtest",
     "productionUrl": "https://equivtest.vercel.app",
-    "deploymentId": "dpl_CNNrvfMEAaJ1me9jhrM493aY7MmY",
-    "deploymentUrl": "https://equivtest-94j8snvny-delealufejoel-4184s-projects.vercel.app",
-    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/CNNrvfMEAaJ1me9jhrM493aY7MmY",
+    "deploymentUrl": "https://equivtest-g2169nuw2-delealufejoel-4184s-projects.vercel.app",
+    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/ERWJWwxKvRQk8GHDcjf8ygUQqDG7",
     "status": "READY",
-    "sourceCommit": "aa249b48d99325ea068f754a70c837b7685364d2",
+    "sourceCommit": "7296d8a0af4b9263630216b794a82657962a4dcb",
+    "deploymentId": "dpl_ERWJWwxKvRQk8GHDcjf8ygUQqDG7",
+    "deploymentHistory": [
+      {"id": "dpl_CNNrvfMEAaJ1me9jhrM493aY7MmY", "sourceCommit": "aa249b48d99325ea068f754a70c837b7685364d2", "purpose": "Initial final manual deployment; superseded after receipt-shape verification found nested execution results."},
+      {"id": "dpl_ERWJWwxKvRQk8GHDcjf8ygUQqDG7", "sourceCommit": "7296d8a0af4b9263630216b794a82657962a4dcb", "purpose": "Corrective final manual deployment with nested StudioNet receipt parsing."}
+    ],
     "manualDeployment": true,
     "automaticGitDeployments": false,
     "publicEnvironment": {
@@ -144,8 +148,8 @@
       "notFinalEvidence": true
     },
     {
-      "finding": "Earlier browser build encoded Python Address arguments as plain strings.",
-      "resolution": "Recursive CalldataAddress encoding, authoritative SUCCESS/FINISHED_WITH_RETURN checks, and readback gating were added before the final manual frontend deployment.",
+      "finding": "Earlier browser build encoded Python Address arguments as plain strings and the first final build did not read nested StudioNet execution results.",
+      "resolution": "Recursive CalldataAddress encoding, authoritative SUCCESS/FINISHED_WITH_RETURN checks, nested leader-receipt parsing, and readback gating were added before the corrective final manual deployment.",
       "notFinalEvidence": false
     }
   ],
