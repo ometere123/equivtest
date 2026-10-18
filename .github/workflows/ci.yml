@@ -20,6 +20,7 @@ jobs:
           export GENVM_VERSION='v0.2.12'
           genvm-lint check contracts/equivtest.py
           genvm-lint check contracts/fixture_milestone.py
+          genvm-lint check contracts/fixture_adversarial.py
           genvm-lint check contracts/fixture_consumer.py
   frontend:
     runs-on: ubuntu-latest
@@ -31,6 +32,7 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node -e "const p=require('./node_modules/genlayer/package.json'); if(p.version!=='0.39.1') process.exit(1); console.log('genlayer CLI',p.version)"
       - run: npm ci --prefix frontend --no-audit --no-fund
+      - run: npm audit --prefix frontend --omit=dev --audit-level=high
       - run: npm run typecheck --prefix frontend
       - run: npm run test --prefix frontend
       - run: npm run build --prefix frontend

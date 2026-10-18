@@ -12,7 +12,7 @@ declare global {interface Window {ethereum?:EthereumProvider}}
 export const CHAIN_ID=61999;
 const PENDING_KEY="equivtest.pending.61999";
 export type Pending={hash:string;address:string;method:string;account:string};
-const parseChainId=(value:unknown)=>{
+export const parseChainId=(value:unknown)=>{
   if(typeof value==="number"&&Number.isInteger(value))return value;
   if(typeof value!=="string")return NaN;
   const text=value.trim();

@@ -3,22 +3,23 @@ import {FormEvent,useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {Suspense} from "react";
 import {PageTitle,FormField,Action,DataMessage,MutationStatus,Refresh,useCounts,useMutation,useRecent,useRecord,Status} from "@/components/Kit";
-import {Suite,Case} from "@/lib/schema";
+import {Suite,Case,Target,isAddress} from "@/lib/schema";
 function SuitesMain(){
  const params=useSearchParams();const [target,setTarget]=useState(params.get("target")??"");
- const [name,setName]=useState("");const [description,setDescription]=useState("");const [supersedes,setSupersedes]=useState("");
+ const [name,setName]=useState("");const [description,setDescription]=useState("");const [supersedes,setSupersedes]=useState("");const [requirementAuthor,setRequirementAuthor]=useState("");
  const [suiteId,setSuiteId]=useState("");const [caseTitle,setCaseTitle]=useState("");const [requirement,setRequirement]=useState("");const [criteria,setCriteria]=useState("");const [severity,setSeverity]=useState("HIGH");
- const create=useMutation(),add=useMutation(),freeze=useMutation();const {counts,refresh}=useCounts();const recent=useRecent<Suite>("S",counts?.suites??0,"get_suite");
+ const create=useMutation(),add=useMutation(),freeze=useMutation();const {counts,refresh}=useCounts();const targets=useRecent<Target>("T",counts?.targets??0,"get_target");const recent=useRecent<Suite>("S",counts?.suites??0,"get_suite");
  const detail=useRecord<Suite>("get_suite",suiteId);
- async function onCreate(e:FormEvent){e.preventDefault();if(await create.run("create_suite",[target,name,description,supersedes])){setName("");setDescription("");await refresh();}}
+ async function onCreate(e:FormEvent){e.preventDefault();if(!target||!isAddress(requirementAuthor)){return;}if(await create.run("create_suite",[target,name,description,supersedes,requirementAuthor])){setName("");setDescription("");await refresh();}}
  async function onAdd(e:FormEvent){e.preventDefault();if(await add.run("add_case",[suiteId,caseTitle,requirement,criteria,severity])){setCaseTitle("");setRequirement("");setCriteria("");await detail.refresh();await refresh();}}
  async function onFreeze(){if(await freeze.run("freeze_suite",[suiteId])){await detail.refresh();await recent.refresh();}}
  return <><PageTitle kicker="02 / Define expectations" title="Test suites" detail="Author requirements and criteria before executing tests. A frozen suite is immutable; later requirements must use a new suite linked to the previous ID."/>
- <div className="panel-grid"><section className="big-card"><h2>Create suite</h2><form onSubmit={onCreate} className="form">
- <FormField label="Registered target ID" value={target} onChange={setTarget} placeholder="T-1"/>
+ <div className="panel-grid"><section className="big-card"><h2>Create suite</h2><p className="note">Three roles are recorded on chain: the target registrant, a suite curator, and a separate requirement author. Use another wallet for the requirement author.</p><form onSubmit={onCreate} className="form">
+ <div className="field"><label htmlFor="target-select">Registered target</label><select id="target-select" value={target} onChange={e=>setTarget(e.target.value)} required><option value="">Choose a registered target…</option>{targets.items.map(t=><option key={t.id} value={t.id}>{t.id} · {t.label} · {t.version}</option>)}</select></div>
  <FormField label="Suite title" value={name} onChange={setName} placeholder="Milestone integrity"/>
  <FormField label="Description" kind="textarea" value={description} onChange={setDescription} placeholder="What behavioural promises does this suite evaluate?"/>
  <FormField label="Supersedes suite ID (blank for new)" required={false} value={supersedes} onChange={setSupersedes} placeholder="S-2"/>
+ <FormField label="Independent requirement author wallet" value={requirementAuthor} onChange={setRequirementAuthor} placeholder="0x… (must differ from curator and target registrant)"/>
  <div className="actions"><Action busy={create.busy}>Create draft suite</Action></div></form><MutationStatus state={create}/></section>
  <section className="big-card"><div className="inline" style={{justifyContent:"space-between"}}><h2>Suites</h2><Refresh onClick={()=>{void refresh();void recent.refresh();}}/></div><DataMessage value={recent.error}/>
  <div className="rows">{recent.items.map(s=><button type="button" className="itemrow" key={s.id} onClick={()=>setSuiteId(s.id)} style={{textAlign:"left",borderColor:s.id===suiteId?"#a3e4c3":undefined}}><div><div className="itemtitle">{s.title}</div><div className="itemmeta">{s.id} · {s.target_id} · {s.case_ids.length} cases</div></div><Status value={s.frozen?"FROZEN":"DRAFT"}/></button>)}

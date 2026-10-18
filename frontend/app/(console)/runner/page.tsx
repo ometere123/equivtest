@@ -5,12 +5,14 @@ import {Case,Run,Suite,Target} from "@/lib/schema";
 export default function Runner(){
  const [suiteId,setSuiteId]=useState("");const [runId,setRunId]=useState("");const [caseId,setCaseId]=useState("");const [observation,setObservation]=useState("");
  const [method,setMethod]=useState("exercise");const [args,setArgs]=useState('["case-1", true, true, false]');
+ const [releaseState,setReleaseState]=useState("DEFERRED");const [findings,setFindings]=useState("0");const [releaseNote,setReleaseNote]=useState("");
+ const [position,setPosition]=useState("CONFORMING");const [interpretation,setInterpretation]=useState("");const [citedFact,setCitedFact]=useState("observed.release_state");
  const counts=useCounts();
  const suites=useRecent<Suite>("S",counts.counts?.suites??0,"get_suite",30);
  const runs=useRecent<Run>("R",counts.counts?.runs??0,"get_run",30);
  const suite=useRecord<Suite>("get_suite",suiteId);const run=useRecord<Run>("get_run",runId);
  const target=useRecord<Target>("get_target",suite.value?.target_id??"");
- const capture=useMutation(),assessment=useMutation(),open=useMutation(),action=useMutation(),close=useMutation();
+ const capture=useMutation(),assessment=useMutation(),open=useMutation(),action=useMutation(),review=useMutation(),close=useMutation();
  useEffect(()=>{if(run.value?.suite_id)setSuiteId(run.value.suite_id);},[run.value?.suite_id]);
  async function mutate(state:ReturnType<typeof useMutation>,fn:string,params:unknown[]){
    if(await state.run(fn,params)){await run.refresh();await runs.refresh();await counts.refresh();}
@@ -21,6 +23,14 @@ export default function Runner(){
     if(!target.value?.address)throw Error("Choose a suite and target first.");
     if(await action.run(method,parsed,target.value.address)){await run.refresh();}
    }catch(err){setLocalError(err instanceof Error?err.message:String(err));}
+ }
+ async function publishGuided(e:FormEvent){e.preventDefault();
+   if(!target.value?.address||!observation.trim())return;
+   await action.run("publish_observation",[observation.trim(),releaseState,Number(findings),releaseNote],target.value.address);
+ }
+ async function submitReview(e:FormEvent){e.preventDefault();
+   if(!target.value?.address||!observation.trim())return;
+   await review.run("submit_interpretation",[observation.trim(),position,interpretation,citedFact],target.value.address);
  }
  const [localError,setLocalError]=useState("");
  return <><PageTitle kicker="03 / Live verification" title="Test runner" detail="Execute genuine target actions, capture public evidence, request independent GenLayer assessment, then close an entirely evaluated run."/>
@@ -39,11 +49,22 @@ export default function Runner(){
   {suite.value&&<p className="note" style={{marginTop:15}}>Suite: {suite.value.title}. Target: {target.value?.label??suite.value.target_id}.</p>}
  </section></div>
  <div className="panel-grid"><section className="big-card"><div className="eyebrow">Step 3</div><h2>Exercise target contract</h2>
- <p className="note">Send an actual target write. The fixture method is exercise(observation_id, material_challenge, unresolved, completed). For any compatible target, supply its real method and JSON calldata arguments. This is not a source-code runner.</p>
+ {target.value?.version==="fixture-adversarial-1"?<>
+ <p className="note">Guided adversarial fixture controls. Publish an immutable public release observation, then use two other wallets to submit conflicting interpretations. Each write is sent to the selected target address.</p>
+ <form className="form" onSubmit={publishGuided}><FormField label="Observation ID" value={observation} onChange={setObservation} placeholder="release-pass-1"/>
+ <div className="field"><label>Public release state</label><select value={releaseState} onChange={e=>setReleaseState(e.target.value)}><option>DEFERRED</option><option>ACTIVATED</option><option>ROLLED_BACK</option></select></div>
+ <FormField label="Unresolved critical findings" value={findings} onChange={setFindings} kind="text" placeholder="0"/>
+ <FormField label="Release note (bounded public fact)" value={releaseNote} onChange={setReleaseNote} placeholder="Recorded public behavior"/>
+ <Action busy={action.busy}>Publish immutable observation</Action></form>
+ <MutationStatus state={action}/><div className="divider"/><h3>Submit this wallet&apos;s interpretation</h3>
+ <form className="form" onSubmit={submitReview}><div className="field"><label>Interpretation</label><select value={position} onChange={e=>setPosition(e.target.value)}><option>CONFORMING</option><option>NONCONFORMING</option><option>UNCERTAIN</option></select></div>
+ <FormField label="Natural-language interpretation" value={interpretation} onChange={setInterpretation} kind="textarea" rows={3} placeholder="Explain how the frozen requirement applies."/>
+ <FormField label="Cited public field" value={citedFact} onChange={setCitedFact} placeholder="observed.release_state"/>
+ <Action busy={review.busy}>Submit independent interpretation</Action></form><MutationStatus state={review}/></>:<>
+ <p className="note">Send an actual target write. This compatible target exposes its own method. Supply its real method and JSON calldata arguments; this is not a source-code runner.</p>
  <form className="form" onSubmit={executeAction}><FormField label="Target write method" value={method} onChange={setMethod} placeholder="exercise"/>
  <FormField label="JSON argument array" kind="textarea" rows={3} value={args} onChange={setArgs} placeholder='["case-1",true,true,false]'/>
- <Action busy={action.busy}>Sign target action</Action></form>
- <DataMessage value={localError}/><MutationStatus state={action}/>
+ <Action busy={action.busy}>Sign target action</Action></form><DataMessage value={localError}/><MutationStatus state={action}/></>}
  <div className="divider"/><div className="eyebrow">Step 4</div><h2>Capture evidence</h2><form className="form" onSubmit={e=>{e.preventDefault();void mutate(capture,"capture_case",[runId,caseId,observation]);}}>
  <div className="field"><label>Case ID from frozen suite</label><input value={caseId} onChange={e=>setCaseId(e.target.value)} list="case-options" placeholder="C-1" required/><datalist id="case-options">{suite.value?.case_ids.map(id=><option key={id} value={id}/>)}</datalist></div>
  <FormField label="Target observation ID" value={observation} onChange={setObservation} placeholder="case-1"/>

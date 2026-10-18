@@ -21,14 +21,24 @@ class MilestoneFixture(gl.Contract):
         self.observations[observation_id] = json.dumps({
             "schema": "equivtest.case/1",
             "observation_id": observation_id,
+            "provenance": "TARGET_PUBLIC_VIEW",
             "input": {"material_challenge": material_challenge, "unresolved": unresolved},
             "output": {"milestone_status": "COMPLETED" if completed else "BLOCKED"},
             "state": {"challenge_status": "OPEN" if unresolved else "RESOLVED"},
+            "observed": {
+                "milestone_status": "COMPLETED" if completed else "BLOCKED",
+                "challenge_status": "OPEN" if unresolved else "RESOLVED",
+            },
+            "claims": {"developer_statement": "The fixture exposes only its stored public state."},
+            "dispute": {
+                "status": "INCOMPLETE", "author_a": str(self.owner), "author_b": "",
+                "position_a": "DECLARED", "position_b": ""
+            },
         }, sort_keys=True)
 
     @gl.public.view
     def get_equivtest_manifest(self) -> str:
-        return json.dumps({"schema": "equivtest.case/1", "version": "fixture-milestone-1"}, sort_keys=True)
+        return json.dumps({"schema": "equivtest.case/1", "version": "fixture-milestone-2"}, sort_keys=True)
 
     @gl.public.view
     def get_equivtest_case(self, observation_id: str) -> str:

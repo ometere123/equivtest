@@ -14,7 +14,8 @@ export default function Registry(){
  </div><div className="two"><div className="field"><label>Target ID</label><input value={targetId} onChange={e=>setTargetId(e.target.value)} placeholder="T-1"/></div>
  <div style={{alignSelf:"end"}}><Refresh onClick={()=>void inspected.refresh()}/></div></div>
  {runId&&suiteId&&targetId&&<div className="itemrow" style={{marginTop:20}}><div><div className="itemtitle">{inspected.value?.certified?"Conformance certified":"No matching passing certification"}</div><div className="itemmeta">Exact IDs and frozen suite digest must match.</div>{inspected.value?.suite_digest&&<div className="itemmeta code">{inspected.value.suite_digest}</div>}
- <div className="itemmeta">{inspected.value?.self_test?"Owner-author/initiator overlap disclosed":"Independent test authorship not guaranteed"}</div></div>
+ <div className="itemmeta">{inspected.value?.reason??"Exact IDs and frozen suite digest must match."}</div>{inspected.value?.suite_digest&&<div className="itemmeta code">{inspected.value.suite_digest}</div>}
+ <div className="itemmeta">{inspected.value?.independent?"Independent tester and role bindings verified":"Role independence is not certified"}</div></div>
  <Status value={inspected.value?.certified?"PASS":"NOT CERTIFIED"}/></div>}
  <DataMessage value={inspected.error}/></section>
  <div style={{marginTop:30}} className="inline"><h2 style={{margin:0}}>Latest public runs</h2><Refresh onClick={()=>{void refresh();void recent.refresh();}}/></div><p className="note">Showing the 30 most recent run IDs. Historical records remain addressable individually.</p>
