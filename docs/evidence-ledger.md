@@ -105,7 +105,7 @@ The runner displayed the pending-finalization recovery state, and reload plus Re
 
 ## Frontend and deployment state
 
-The seven product routes are /, /dashboard, /projects, /suites, /runner, /results, and /registry. Production deployment verification is recorded in deployment-manifest.json; the final manual Vercel deployment and route checks are completed after the corrected public address is configured. GitHub push deployment is disabled.
+The seven product routes are /, /dashboard, /projects, /suites, /runner, /results, and /registry. The final manual Vercel deployment is READY at https://equivtest.vercel.app, deployment dpl_6KHTMsL7JisBXzyCFJacJikwzcgk. All seven routes returned HTTP 200. Production registry readback derived R-1 to S-1/T-1 and displayed CERTIFIED/PASS; R-2 and R-3 displayed NOT CERTIFIED. GitHub push deployment is disabled.
 
 The browser client connects only through injected EIP-1193 wallets, enforces chain 61999, rechecks account and chain before writes, polls StudioNet finalization for five minutes, distinguishes FINALIZED from execution SUCCESS, stores a pending hash for interrupted-session recovery, and performs method-specific state readback before clearing the pending marker or displaying completion.
 

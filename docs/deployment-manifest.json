@@ -115,7 +115,11 @@
   "frontend": {
     "project": "equivtest",
     "productionUrl": "https://equivtest.vercel.app",
-    "status": "PENDING_FINAL_MANUAL_DEPLOYMENT",
+    "deploymentUrl": "https://equivtest-670tvsip3-delealufejoel-4184s-projects.vercel.app",
+    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/6KHTMsL7JisBXzyCFJacJikwzcgk",
+    "deploymentId": "dpl_6KHTMsL7JisBXzyCFJacJikwzcgk",
+    "status": "READY",
+    "sourceCommit": "8e27181",
     "manualDeployment": true,
     "automaticGitDeployments": false,
     "publicEnvironment": {
@@ -124,6 +128,14 @@
       "equivtestAddress": "0x7E058b6dCfa30c28912604589C7D4DA8073d9390"
     },
     "routes": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"],
+    "routeCheckResult": "All seven production routes returned HTTP 200 after dpl_6KHTMsL7JisBXzyCFJacJikwzcgk.",
+    "publicRegistryReadback": "Production /registry derived R-1 -> S-1/T-1 and displayed CERTIFIED/PASS after readback; R-2 and R-3 displayed NOT CERTIFIED.",
+    "deploymentHistory": [
+      {"id": "dpl_CNNrvfMEAaJ1me9jhrM493aY7MmY", "purpose": "Initial manual deployment; superseded after nested receipt-shape verification."},
+      {"id": "dpl_ERWJWwxKvRQk8GHDcjf8ygUQqDG7", "purpose": "Corrective manual deployment with nested StudioNet receipt parsing."},
+      {"id": "dpl_72X5ziZK59UsXAiGJpV7FkHodbos", "purpose": "Manual deployment extending finalization polling and interrupted-session recovery."},
+      {"id": "dpl_6KHTMsL7JisBXzyCFJacJikwzcgk", "purpose": "Final manual deployment of the corrected qualitative contract binding and public environment."}
+    ],
     "finalizationPolling": {
       "intervalMs": 5000,
       "retries": 60,

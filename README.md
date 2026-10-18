@@ -178,7 +178,7 @@ Install or unlock an injected EIP-1193 wallet, switch it to StudioNet 61999, and
 
 ## Deployment and CI
 
-The production frontend is manually deployed at [https://equivtest.vercel.app](https://equivtest.vercel.app) with public chain ID `61999`, RPC `https://studio.genlayer.com/api`, and the corrected EquivTest address `0x7E058b6dCfa30c28912604589C7D4DA8073d9390`. Vercel project Git integration remains disabled; no GitHub push deployment is used. The final deployment identifier and route checks are recorded in the manifest.
+The production frontend is manually deployed at [https://equivtest.vercel.app](https://equivtest.vercel.app) with public chain ID `61999`, RPC `https://studio.genlayer.com/api`, and the corrected EquivTest address `0x7E058b6dCfa30c28912604589C7D4DA8073d9390`. The final READY deployment is `dpl_6KHTMsL7JisBXzyCFJacJikwzcgk`; all seven routes returned HTTP 200 and the public registry read back R-1 as CERTIFIED/PASS. Vercel project Git integration remains disabled; no GitHub push deployment is used.
 
 The GitHub Actions workflow installs the locked root and frontend lockfiles with `npm ci`, checks the CLI version, runs compile/state/Direct Mode tests, lints all four contracts with GenVM `v0.2.12`, audits production dependencies, typechecks, unit-tests, builds, and runs Playwright. It does not deploy.
 
