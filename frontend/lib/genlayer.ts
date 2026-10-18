@@ -1,6 +1,6 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
-import { TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
+import { CalldataAddress, TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
 import { isAddress, parseRecord } from "./schema";
 
 export interface EthereumProvider {
@@ -36,6 +36,20 @@ export const getProvider=():EthereumProvider|null=>
   typeof window==="undefined"?null:window.ethereum??null;
 
 export const readClient=()=>createClient({chain:studionet});
+function hexToBytes(value:string){
+  const bytes=new Uint8Array(value.length/2);
+  for(let index=0;index<bytes.length;index++)bytes[index]=Number.parseInt(value.slice(index*2,index*2+2),16);
+  return bytes;
+}
+function toCalldataValue(value:unknown):unknown{
+  if(value instanceof CalldataAddress||value instanceof Uint8Array)return value;
+  if(typeof value==="string"&&isAddress(value))return new CalldataAddress(hexToBytes(value.slice(2)));
+  if(Array.isArray(value))return value.map(toCalldataValue);
+  if(value instanceof Map)return new Map(Array.from(value.entries(),([key,item])=>[key,toCalldataValue(item)]));
+  if(value&&typeof value==="object")return Object.fromEntries(Object.entries(value).map(([key,item])=>[key,toCalldataValue(item)]));
+  return value;
+}
+export const toCalldataArgs=(args:unknown[])=>args.map(toCalldataValue);
 async function ensureStudioNet(provider:EthereumProvider){
   const current=await provider.request({method:"eth_chainId"});
   if(parseChainId(current)!==CHAIN_ID){
@@ -62,7 +76,7 @@ async function assertWalletReady(provider:EthereumProvider,account:string){
 export async function readAt(address:string,method:string,args:unknown[]=[]):Promise<unknown>{
   if(!isAddress(address)) throw Error("A valid contract address is required.");
   return readClient().readContract({
-    address:address as `0x${string}`,functionName:method,args:args as never[],
+    address:address as `0x${string}`,functionName:method,args:toCalldataArgs(args) as never[],
     transactionHashVariant:TransactionHashVariant.LATEST_FINAL
   });
 }
@@ -93,7 +107,7 @@ export async function submit(address:string,account:string,method:string,args:un
   if(pendingTransaction()) throw Error("A previous transaction is awaiting final execution verification. Resume it before submitting another write.");
   await assertWalletReady(provider,account);
   const client=createClient({chain:studionet,account:account as `0x${string}`,provider:provider as never});
-  const write={address:address as `0x${string}`,functionName:method,args:args as never[]};
+  const write={address:address as `0x${string}`,functionName:method,args:toCalldataArgs(args) as never[]};
   // StudioNet 61999 uses the stable 1.1.8 SDK, not the Consensus v0.6 fee-profile API.
   const hash=await client.writeContract({...write,value:BigInt(0)});
   window.localStorage.setItem(PENDING_KEY,JSON.stringify({hash,address,method,account}));
@@ -102,8 +116,12 @@ export async function submit(address:string,account:string,method:string,args:un
   // FINALIZED is not equivalent to successful contract execution.
   const execution=executionName(receipt);
   if(!execution) throw Error("Transaction finalized but execution success is unverified. Inspect receipt: "+hash);
-  if(!executionSucceeded(receipt))
+  if(!executionSucceeded(receipt)){
+    // A finalized contract error is terminal; keep the pending marker only while
+    // the network has not yet revealed the authoritative execution result.
+    window.localStorage.removeItem(PENDING_KEY);
     throw Error("Transaction not successfully executed ("+execution+"): "+hash);
+  }
   window.localStorage.removeItem(PENDING_KEY);
   return hash;
 }
@@ -115,8 +133,10 @@ export async function resumePending():Promise<string>{
   });
   const execution=executionName(receipt);
   if(!execution)throw Error("Transaction finalized but execution success is unverified: "+pending.hash);
-  if(!executionSucceeded(receipt))
+  if(!executionSucceeded(receipt)){
+    window.localStorage.removeItem(PENDING_KEY);
     throw Error("Transaction finalized without successful execution ("+execution+"): "+pending.hash);
+  }
   window.localStorage.removeItem(PENDING_KEY);
   return pending.hash;
 }

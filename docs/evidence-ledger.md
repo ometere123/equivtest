@@ -7,7 +7,7 @@ This ledger distinguishes source-level verification from live network evidence. 
 | Item | Evidence | Status |
 | --- | --- | --- |
 | Requested source baseline | `016568ddcccbb92eaa7d88fc85294aa5e66e12f9` | inspected |
-| Verified application source commit | `9290af92448947ff5ac9b98e8828aa15f317a178` | tested and deployed |
+| Verified application source commit | `9290af92448947ff5ac9b98e8828aa15f317a178` | tested and deployed; browser calldata fix is now committed separately |
 | Production registry source | `contracts/equivtest.py` | corrected and linted |
 | Demonstration target | `contracts/fixture_milestone.py` | linted |
 | Demonstration consumer | `contracts/fixture_consumer.py` | linted |
@@ -33,7 +33,7 @@ The Direct Mode suite covers PASS, FAIL, INCONCLUSIVE, malformed leader output r
 | `npm ci --ignore-scripts --no-audit --no-fund` | installed root lockfile; `genlayer@0.39.1` checked |
 | `npm ci --prefix frontend --ignore-scripts --no-audit --no-fund` | installed frontend lockfile |
 | `npm run typecheck --prefix frontend` | passed |
-| `npm run test --prefix frontend` | 1 file, 4 tests passed |
+| `npm run test --prefix frontend` | 2 files, 6 tests passed |
 | `npm run build --prefix frontend` | passed; all 7 routes generated |
 | `CI=1 npx --no-install playwright test` from `frontend` | 4 passed across desktop and mobile projects |
 | `npm audit --omit=dev --audit-level=high` | root: 0 vulnerabilities |
@@ -58,7 +58,7 @@ The frontend security fixes include chain/account revalidation, exact `FINISHED_
 | Consumer integration | R-1 approved; R-2 rejection finalized with leader execution ERROR and no successful state mutation | passed |
 | Production Vercel deployment | [`https://equivtest.vercel.app`](https://equivtest.vercel.app), deployment `dpl_8L76h3tU5C9X488bq8PYkrnt9cvh` | READY; manual, no GitHub auto-deploy |
 | Production route/readback check | Seven routes HTTP 200; registry displayed R-1 through R-4 and exact R-1/R-4 verification | passed |
-| Injected-wallet browser signing | Chrome `window.ethereum` was absent; page remained public/read-only and reported no injected wallet | blocked by browser environment, not claimed |
+| Injected-wallet browser signing | Production `/projects` connected to Rabby on StudioNet 61999 and submitted [`0x91d436…`](https://explorer-studio.genlayer.com/tx/0x91d436ad6ba2b4e735a441ed13c5dcad33b4217701fad1b91ebcc0989fe09f58) | finalized with `FINISHED_WITH_ERROR`; no state mutation |
 | Source-alignment GitHub Actions run for `9290af92448947ff5ac9b98e8828aa15f317a178` | [run 39070621862](https://github.com/ometere123/equivtest/actions/runs/39070621862): `python-and-contract` and `frontend` both passed | passed |
 
 ## Security fixes recorded
@@ -80,3 +80,11 @@ The frontend security fixes include chain/account revalidation, exact `FINISHED_
 3. The frontend development dependency audit retains 10 findings whose automatic fixes require breaking major upgrades. Production dependencies have zero reported vulnerabilities under `--omit=dev`.
 
 The complete deployment manifest, transaction ledger, role addresses, source parity results, and Vercel identifiers are in `docs/deployment-manifest.json`.
+
+## Browser transaction follow-up
+
+The production browser attempt used the connected Rabby account `0xfcef676044658B5402f590daBe9E04A0F640522f` and the valid milestone fixture address. The transaction finalized on StudioNet with consensus agreement, but each execution returned `TypeError: address expected` at `gl.get_contract_at(target_address)`. The receipt's authoritative execution result was `FINISHED_WITH_ERROR`; `get_counts()` remained `{"targets":1,"suites":2,"cases":2,"runs":4}`, so no target or certification was created.
+
+Root cause: `genlayer-js@1.1.8` encodes JavaScript strings as GenVM strings. Python `Address` parameters must be encoded as the SDK's `CalldataAddress`, which the CLI constructs automatically. The frontend now recursively converts valid address arguments to `CalldataAddress` for reads and writes, and clears a pending marker after a known terminal execution error while retaining it for an unverified receipt. Vitest, typecheck, and production build pass with this correction.
+
+The existing Vercel deployment remains the single manual deployment at source commit `9290af92448947ff5ac9b98e8828aa15f317a178`. No second Vercel deployment was issued because the requested one-deployment constraint had already been consumed; therefore the corrected browser write path is verified in source/local build but is not yet present at the public production URL.

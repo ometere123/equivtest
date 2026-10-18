@@ -123,8 +123,22 @@
     "routeChecks": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"],
     "routeCheckResult": "All seven production routes returned HTTP 200. The public registry readback displayed R-1 through R-4 and exact R-1/R-4 verification."
   },
+  "browserVerification": {
+    "environment": "Chrome with Rabby injected wallet",
+    "account": "0xfcef676044658B5402f590daBe9E04A0F640522f",
+    "network": "StudioNet 61999",
+    "attemptedMethod": "register_target",
+    "transactionHash": "0x91d436ad6ba2b4e735a441ed13c5dcad33b4217701fad1b91ebcc0989fe09f58",
+    "explorerTx": "https://explorer-studio.genlayer.com/tx/0x91d436ad6ba2b4e735a441ed13c5dcad33b4217701fad1b91ebcc0989fe09f58",
+    "executionStatus": "FINALIZED / MAJORITY_AGREE / FINISHED_WITH_ERROR",
+    "error": "TypeError: address expected at gl.get_contract_at(target_address)",
+    "stateMutation": "none; counts remained targets=1, suites=2, cases=2, runs=4",
+    "rootCause": "The deployed frontend passed a JavaScript string where GenLayerJS 1.1.8 requires CalldataAddress for a Python Address parameter.",
+    "sourceFix": "frontend/lib/genlayer.ts now recursively encodes valid address arguments as CalldataAddress and treats known terminal execution errors as non-pending.",
+    "productionRedeploy": "not performed; the requested single manual Vercel deployment was already used"
+  },
   "limitations": [
-    "The Chrome profile used for production browser verification exposes no window.ethereum provider, so injected-wallet signing could not be completed in that profile. The deployed frontend correctly reports that no injected wallet is detected; no extension was installed and no private key was entered into a browser.",
+    "The corrected browser calldata path is committed and passes local checks, but the single existing Vercel deployment predates the fix. A second Vercel deployment would be required to make the corrected write path live at https://equivtest.vercel.app.",
     "The Windows Direct Mode harness is not counted as evidence because genlayer-test 0.29.2 hits a Windows file-lock PermissionError during loader cleanup; the same six Direct Mode tests pass under WSL.",
     "The full frontend development audit reports 10 dev-only vulnerabilities (3 moderate, 5 high, 2 critical); npm audit reports zero production vulnerabilities. Automatic fixes require breaking Vitest 5 and Tailwind 4 upgrades and were not applied to the locked StudioNet-compatible release."
   ]
