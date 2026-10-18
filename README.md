@@ -134,10 +134,10 @@ The source and test changes in this checkout were verified locally as follows:
 | Frontend unit tests | 4 passed |
 | Next production build | passed; all seven routes generated |
 | Playwright desktop/mobile smoke tests | 4 passed |
-| npm production dependency audit | root 0 vulnerabilities; frontend 0 vulnerabilities |
+| npm production dependency audit | root 0 vulnerabilities; frontend 0 vulnerabilities (`--omit=dev`) |
 | GitHub Actions final pushed run | 2 jobs passed: `python-and-contract`, `frontend` |
 
-The Windows Direct Mode run is not counted as contract evidence because `genlayer-test` 0.29.2 currently fails in its loader while deleting an open temporary file (`PermissionError`, Windows file-lock behavior). The same six tests pass under WSL. Live StudioNet deployment, live four-wallet browser operations, and production Vercel deployment remain separate evidence gates until authorized deployment credentials and a verified contract address are available; see `docs/evidence-ledger.md`.
+The Windows Direct Mode run is not counted as contract evidence because `genlayer-test` 0.29.2 currently fails in its loader while deleting an open temporary file (`PermissionError`, Windows file-lock behavior). The same six tests pass under WSL. StudioNet deployment, source parity, five-role CLI/SDK wallet operations, and manual Vercel deployment are recorded in `docs/deployment-manifest.json`. The production Chrome profile used for browser verification had no injected EIP-1193 provider, so browser signing remains an environment limitation rather than an unverified claim; see `docs/evidence-ledger.md`.
 
 ## Deployment evidence
 
@@ -149,7 +149,7 @@ The intended contract source hashes currently are:
 | `contracts/fixture_milestone.py` | `10EFE6FD25FD4F19B478A52C33B50CDA1D90D656EC9C0E653BAE9AF4D97D58FB` |
 | `contracts/fixture_consumer.py` | `2F3F91636F82C97ED7987A9EFB540A0C9003416CDCFAEF289518EF5BCBAF4CE1` |
 
-`docs/deployment-manifest.json` records the current deployment gate status and the exact network/toolchain target. It must be updated with addresses, transaction hashes, execution results, explorer links, and deployed-source byte comparison only after a real StudioNet deployment confirms them. An explorer page by itself is not source-parity evidence.
+`docs/deployment-manifest.json` records the verified StudioNet addresses, transaction hashes, execution results, explorer links, source SHA-256 values, raw deployed-byte comparisons, wallet roles, live run outcomes, and the manual Vercel deployment. An explorer page by itself is not source-parity evidence.
 
 ## Failure recovery
 
@@ -162,4 +162,4 @@ The intended contract source hashes currently are:
 
 GitHub Actions installs the root CLI lockfile and frontend lockfile with `npm ci`, checks `genlayer@0.39.1`, runs deterministic and Direct Mode tests, validates all contracts with `genvm-linter==0.11.0`, and runs typecheck, unit, build, and Playwright checks. The workflow is intentionally not a Vercel deployment workflow.
 
-The final verified CI run is [39070406109](https://github.com/ometere123/equivtest/actions/runs/39070406109). The closeout report supplies the final commit compare link and separates these automated results from the still-blocked live deployment evidence.
+The source-alignment CI run is [39070621862](https://github.com/ometere123/equivtest/actions/runs/39070621862); both `python-and-contract` and `frontend` passed. The closeout report supplies the final pushed commit's CI URL and separates automated results from the browser-provider limitation.

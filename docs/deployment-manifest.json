@@ -1,15 +1,15 @@
 {
-  "status": "BLOCKED_BEFORE_DEPLOYMENT",
-  "observedAt": "2026-10-17",
+  "status": "DEPLOYED_AND_VERIFIED",
+  "observedAt": "2026-10-18",
   "repository": "https://github.com/ometere123/equivtest",
   "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
-  "verifiedSourceCommit": "a70cc9760fba4a0249e01cf62636a296d2eef2d9",
-  "verifiedCiRun": "https://github.com/ometere123/equivtest/actions/runs/39070406109",
+  "verifiedSourceCommit": "9290af92448947ff5ac9b98e8828aa15f317a178",
+  "verifiedCiRun": "https://github.com/ometere123/equivtest/actions/runs/39070621862",
   "network": {
     "name": "GenLayer StudioNet",
     "chainId": 61999,
     "rpc": "https://studio.genlayer.com/api",
-    "explorer": "https://genlayer-explorer.vercel.app"
+    "explorer": "https://explorer-studio.genlayer.com"
   },
   "toolchain": {
     "genlayerCli": "0.39.1",
@@ -30,10 +30,102 @@
     }
   },
   "deployments": {
-    "equivtest": null,
-    "fixtureMilestone": null,
-    "fixtureConsumer": null
+    "equivtest": {
+      "address": "0x647483f23849895d0c7e6c4fAd267d76a6365B5A",
+      "deploymentTx": "0xf8a08f5bf305ff1b063d769549be7327bbd27a6aa136ad0d4f830514ec5d3210",
+      "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0xf8a08f5bf305ff1b063d769549be7327bbd27a6aa136ad0d4f830514ec5d3210",
+      "localBytes": 19490,
+      "deployedBytes": 19490,
+      "sourceSha256": "FEEC8E28BE125C0FD3F83846935DA4B0DD64C1EBB6475988359A3ABDC11841FC",
+      "sourceParity": "EXACT"
+    },
+    "fixtureMilestone": {
+      "address": "0xe8A8590B3259A4bFDf06462EaCE4e3d9A6A25B1f",
+      "deploymentTx": "0x6bda6ccb05740235c86f25ccb748ec8f2cd1c4c49d09f203c655a633058523e6",
+      "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x6bda6ccb05740235c86f25ccb748ec8f2cd1c4c49d09f203c655a633058523e6",
+      "localBytes": 1652,
+      "deployedBytes": 1652,
+      "sourceSha256": "10EFE6FD25FD4F19B478A52C33B50CDA1D90D656EC9C0E653BAE9AF4D97D58FB",
+      "sourceParity": "EXACT"
+    },
+    "fixtureConsumer": {
+      "address": "0xa46fB1560e1Ea477c76da269bDD14e6FD5Ae3674",
+      "deploymentTx": "0x03b6a1c950da74126bcb7b81a86b7271d7ea2b58ec1eacf605ee962263917245",
+      "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x03b6a1c950da74126bcb7b81a86b7271d7ea2b58ec1eacf605ee962263917245",
+      "localBytes": 1077,
+      "deployedBytes": 1077,
+      "sourceSha256": "2F3F91636F82C97ED7987A9EFB540A0C9003416CDCFAEF289518EF5BCBAF4CE1",
+      "sourceParity": "EXACT"
+    }
   },
-  "sourceParity": null,
-  "blocker": "The available StudioNet CLI accounts are encrypted and locked; no authorized password or private key was provided, so no deployment transaction was submitted."
+  "sourceParity": {
+    "method": "GenLayerJS 1.1.8 getContractCode raw-byte comparison",
+    "allContractsExact": true,
+    "result": "Each retrieved byte sequence matched the intended local source byte-for-byte and produced the listed SHA-256."
+  },
+  "liveDemonstration": {
+    "wallets": [
+      {"role": "deployer", "label": "praest-deployer", "address": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7"},
+      {"role": "suite-builder", "label": "equivtest-builder", "address": "0xcae3bf2755e18448aa5bb15d632815deb7780f18"},
+      {"role": "tester", "label": "equivtest-tester", "address": "0x8686f3c2434caf7ff9adb5fcacace67b7b987eb7"},
+      {"role": "auditor", "label": "equivtest-auditor", "address": "0x3161ad2ce7e22af8d7e751d97a1cd5205706fda2"},
+      {"role": "consumer", "label": "equivtest-consumer", "address": "0xa35d8b9adbb548c27638e13957f52e4a893d29fd"}
+    ],
+    "target": {
+      "id": "T-1",
+      "address": "0xe8A8590B3259A4bFDf06462EaCE4e3d9A6A25B1f",
+      "duplicateRegistrationTx": "0xce11a7ac20dfec46ee0138d3f7354fd0cc8a2becc1fda43676d6b4224652f5d9",
+      "duplicateRegistrationResult": "Existing T-1 returned; no duplicate target state created."
+    },
+    "suiteS1": {
+      "createTx": "0xd68493a01e6277a723f6c275e2cfc98deccec0932f569d7ac59d0628cc5b627d",
+      "caseTx": "0xb8aed95cf586877976125770461967859489d18d9196affa517fb941bdebe95b",
+      "freezeTx": "0xe88f3ed2a25d92b156fbbbab7dddb4e711ba4d630a99bdc98772b8d6e23f15e7",
+      "digest": "e0122c7372ef6bac3dda666dc2743bb48e91c6a57f14a5f74fe5afd9d66b7f6b"
+    },
+    "suiteS2": {
+      "createTx": "0xf283e5337dcb9e76ec1057982150d560875a82859d05acea5af9528b0d370df7",
+      "caseTx": "0xd173f5e31c5259635318c0528b061e463acd308278e6d3af2c232ef9494a6885",
+      "freezeTx": "0x7c9f74ef4cd7b900663b0be14b9f3ddb0653bde6f64250c012b0324b8530fca0",
+      "digest": "f99a1de429a5f21552b89ecebbacca1c9a2e6d0621fe4da9669011a5425ad189",
+      "purpose": "Ambiguous requirement produces INCONCLUSIVE."
+    },
+    "runs": {
+      "R-1": {"outcome": "PASS", "suite": "S-1", "openTx": "0x870a5b083f8e4b2bf07b7720d701c4d0099a5d2446a8dc6e8d4fa75fe6448994", "actionTx": "0x6e73377c1cbb66cea23669ba59426f46c7b2ecd3842e807a453e33772c54f324", "captureTx": "0xb95fe8d38f83cd2206c7c627d90e86b74d32db429fb5cb6787be2aabee9ac83", "evaluateTx": "0x80e1ac0cb1f1229c38b7423a4770714919f65464891ee270017ab6b9d285790a", "closeTx": "0x2a58a499824ea70c83d452b0220de011743f77debd13aea6428dc6ce009f6940"},
+      "R-2": {"outcome": "FAIL", "suite": "S-1", "openTx": "0x7d9ad028e12a18c7da78597a378418ea49c59329c398553af92dbb73f29b1058", "actionTx": "0x11f8858e393ee521388ec9888fd6cceb37a41ace80372c2586b89f49a7603d18", "captureTx": "0x20e2dae4e5f83ff5b05d89a364047f69e66f87535863f113fb826df50fb11396", "evaluateTx": "0x8f047b27d035ee2c40cd3f8ddd6a72e3dcc8969fd07ca2c27b8200eeb7f7fa62", "closeTx": "0xd555a0237e145dc02b339323bd18591f5e8fe1da70fabf065fffda0062ae401e"},
+      "R-3": {"outcome": "INCONCLUSIVE", "suite": "S-2", "openTx": "0x2d2c4c0ef71171e60efc9a0a80882ee70cff9342d9a3a0e203f3288a02d58166", "actionTx": "0x5e56aacb5cee47211e5cf3b1ce072b244d5e6b151ca6d4c7d5aa0e7053c114de", "captureTx": "0x96ae440bf307abf922252bb020d9928032b3ad3a8163a7d895ae9930c797ca83", "evaluateTx": "0x1e3790d7ab376cb8027743aaf3170bc03c206df8581172730e77e743a77fb5a7", "closeTx": "0xc9c43613562aafd353d1b2f1b9b08adc87808e7ce6afef5e001d2f02013e002c"},
+      "R-4": {"outcome": "PASS", "suite": "S-1", "recheckOf": "R-1", "openTx": "0xae72bf16a0b85cbc211983098662c9fe05c389896b30c86a5e92c2758d52fea7", "actionTx": "0x6cde05ca318fd4ac46fab77d43625ced29201beabcc6d6778aa9e6bec4ca567a", "captureTx": "0xd48972d870ad4cd31b4d0d4afe358e539eb5286db4a9c99c23329b01fe18164f", "evaluateTx": "0x7a66001d525e3eb3d5f96bd20ea569dfce9863af07fd685053dbf1e461e7f425", "closeTx": "0x976ef5869b7100023699b0ed1cef66ce15ebb64eac8584f12c047e725fee78cb"}
+    },
+    "consumer": {
+      "approveR1Tx": "0xfaf63969982b073c4240ebe35223669996d593ae19f037f5055ee4cd9ec26e3b",
+      "rejectR2Tx": "0x128290b567346d148d8915b579a52c3bc42260152f289ea7c1a806e5f5e81c38",
+      "result": "R-1 approved; R-2 rejected. The rejection transaction finalized but its leader execution was ERROR and is not counted as a successful state mutation."
+    },
+    "readback": {
+      "counts": {"targets": 1, "suites": 2, "cases": 2, "runs": 4},
+      "conformance": {"R-1": true, "R-2": false, "R-3": false, "R-4": true, "R-1-with-S-2": false}
+    }
+  },
+  "frontend": {
+    "vercelProject": "equivtest",
+    "deploymentId": "dpl_8L76h3tU5C9X488bq8PYkrnt9cvh",
+    "deploymentUrl": "https://equivtest-r4sgh82rn-delealufejoel-4184s-projects.vercel.app",
+    "productionUrl": "https://equivtest.vercel.app",
+    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/8L76h3tU5C9X488bq8PYkrnt9cvh",
+    "status": "READY",
+    "sourceCommit": "9290af92448947ff5ac9b98e8828aa15f317a178",
+    "manualDeployment": true,
+    "automaticGitDeployments": false,
+    "publicEnvironment": {"chainId": 61999, "rpc": "https://studio.genlayer.com/api", "equivtestAddress": "0x647483f23849895d0c7e6c4fAd267d76a6365B5A"},
+    "routeChecks": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"],
+    "routeCheckResult": "All seven production routes returned HTTP 200. The public registry readback displayed R-1 through R-4 and exact R-1/R-4 verification."
+  },
+  "limitations": [
+    "The Chrome profile used for production browser verification exposes no window.ethereum provider, so injected-wallet signing could not be completed in that profile. The deployed frontend correctly reports that no injected wallet is detected; no extension was installed and no private key was entered into a browser.",
+    "The Windows Direct Mode harness is not counted as evidence because genlayer-test 0.29.2 hits a Windows file-lock PermissionError during loader cleanup; the same six Direct Mode tests pass under WSL.",
+    "The full frontend development audit reports 10 dev-only vulnerabilities (3 moderate, 5 high, 2 critical); npm audit reports zero production vulnerabilities. Automatic fixes require breaking Vitest 5 and Tailwind 4 upgrades and were not applied to the locked StudioNet-compatible release."
+  ]
 }

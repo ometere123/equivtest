@@ -1,13 +1,13 @@
 # EquivTest evidence ledger
 
-This ledger distinguishes source-level verification from live network evidence. It is intentionally conservative: a local pass is not presented as StudioNet or browser-wallet proof.
+This ledger distinguishes source-level verification from live network evidence. It is intentionally conservative: local passes are not presented as StudioNet proof, and CLI/SDK signer operations are not presented as injected-browser-wallet proof.
 
 ## Baseline and source
 
 | Item | Evidence | Status |
 | --- | --- | --- |
 | Requested source baseline | `016568ddcccbb92eaa7d88fc85294aa5e66e12f9` | inspected |
-| Remote `main` at audit time | same SHA as baseline | inspected |
+| Verified application source commit | `9290af92448947ff5ac9b98e8828aa15f317a178` | tested and deployed |
 | Production registry source | `contracts/equivtest.py` | corrected and linted |
 | Demonstration target | `contracts/fixture_milestone.py` | linted |
 | Demonstration consumer | `contracts/fixture_consumer.py` | linted |
@@ -37,27 +37,29 @@ The Direct Mode suite covers PASS, FAIL, INCONCLUSIVE, malformed leader output r
 | `npm run build --prefix frontend` | passed; all 7 routes generated |
 | `CI=1 npx --no-install playwright test` from `frontend` | 4 passed across desktop and mobile projects |
 | `npm audit --omit=dev --audit-level=high` | root: 0 vulnerabilities |
-| `npm audit --prefix frontend --omit=dev --audit-level=high` | frontend: 0 vulnerabilities |
+| `npm audit --prefix frontend --omit=dev --audit-level=high` | frontend production dependencies: 0 vulnerabilities |
+| `npm audit --prefix frontend --audit-level=high` | 10 dev-tree findings: 3 moderate, 5 high, 2 critical; fixes require breaking Vitest 5/Tailwind 4 upgrades |
 
 The frontend security fixes include chain/account revalidation, exact `FINISHED_WITH_RETURN` receipt validation, resumable pending transactions, duplicate submission blocking, accessible form labels/statuses, and explorer links for verified hashes.
 
-## Live deployment gates
+## Live StudioNet and deployment evidence
 
 | Gate | Evidence | Status |
 | --- | --- | --- |
 | StudioNet RPC | `eth_chainId` returned `0xf22f` | passed |
 | CLI version | local `genlayer --version` returned `0.39.1` | passed |
 | CLI network | `network info` reported StudioNet 61999 and the locked RPC | passed |
-| Deployment signer | funded CLI accounts exist but are encrypted and locked | blocked: no authorized password/private key available |
-| EquivTest deployment | no transaction submitted | not performed |
-| Fixture deployments | no transaction submitted | not performed |
-| Deployed source retrieval/parity | no deployed address | not applicable |
-| Four-wallet browser demonstration | no deployed address / no configured production contract | not performed |
-| Vercel project | authenticated account inspected; no EquivTest project linked | not performed |
-| Vercel production URL | none created | blocked by missing verified contract address |
-| Final GitHub Actions run for `a70cc9760fba4a0249e01cf62636a296d2eef2d9` | [run 39070406109](https://github.com/ometere123/equivtest/actions/runs/39070406109): `python-and-contract` and `frontend` both passed | passed |
-
-The exact blocker is credential availability, not an RPC/network mismatch. The CLI listed funded accounts such as `praest-deployer`, but they reported `status: locked`; no password or private signing key was supplied or recoverable from the repository. No credential guessing or unverified deployment was attempted.
+| Deployment signer | Disposable `praest-deployer` plus four role-separated disposable accounts; no private keys committed | passed |
+| EquivTest deployment | `0x647483f23849895d0c7e6c4fAd267d76a6365B5A`; tx [`0xf8a08f…`](https://explorer-studio.genlayer.com/tx/0xf8a08f5bf305ff1b063d769549be7327bbd27a6aa136ad0d4f830514ec5d3210) | finalized, execution SUCCESS |
+| Milestone fixture deployment | `0xe8A8590B3259A4bFDf06462EaCE4e3d9A6A25B1f`; tx [`0x6bda6c…`](https://explorer-studio.genlayer.com/tx/0x6bda6ccb05740235c86f25ccb748ec8f2cd1c4c49d09f203c655a633058523e6) | finalized, execution SUCCESS |
+| Consumer fixture deployment | `0xa46fB1560e1Ea477c76da269bDD14e6FD5Ae3674`; tx [`0x03b6a1…`](https://explorer-studio.genlayer.com/tx/0x03b6a1c950da74126bcb7b81a86b7271d7ea2b58ec1eacf605ee962263917245) | finalized, execution SUCCESS |
+| Deployed source retrieval/parity | `getContractCode` raw bytes matched all three local files exactly; lengths 19490 / 1652 / 1077 | passed |
+| Live role-separated operations | T-1, S-1/S-2, R-1 PASS, R-2 FAIL, R-3 INCONCLUSIVE, R-4 linked PASS | passed via CLI/SDK signers |
+| Consumer integration | R-1 approved; R-2 rejection finalized with leader execution ERROR and no successful state mutation | passed |
+| Production Vercel deployment | [`https://equivtest.vercel.app`](https://equivtest.vercel.app), deployment `dpl_8L76h3tU5C9X488bq8PYkrnt9cvh` | READY; manual, no GitHub auto-deploy |
+| Production route/readback check | Seven routes HTTP 200; registry displayed R-1 through R-4 and exact R-1/R-4 verification | passed |
+| Injected-wallet browser signing | Chrome `window.ethereum` was absent; page remained public/read-only and reported no injected wallet | blocked by browser environment, not claimed |
+| Source-alignment GitHub Actions run for `9290af92448947ff5ac9b98e8828aa15f317a178` | [run 39070621862](https://github.com/ometere123/equivtest/actions/runs/39070621862): `python-and-contract` and `frontend` both passed | passed |
 
 ## Security fixes recorded
 
@@ -71,11 +73,10 @@ The exact blocker is credential availability, not an RPC/network mismatch. The C
 - Require exact conformance tuple and frozen digest for certification.
 - Require wallet chain/account checks and successful execution-result verification before clearing pending writes.
 
-## Remaining evidence required for a full closeout
+## Remaining genuine limitations
 
-1. Supply or unlock an authorized StudioNet deployment wallet.
-2. Deploy the registry and fixtures, record transaction hashes and finalized execution results.
-3. Retrieve deployed source bytes and compare SHA-256 to this checkout.
-4. Execute the four-wallet PASS, FAIL, INCONCLUSIVE, recheck, consumer-accept, and consumer-reject flows.
-5. Set the verified registry address in Vercel, deploy manually, and repeat route/readback checks.
-6. Push the final commit and attach the resulting green GitHub Actions run.
+1. The Chrome profile available to the verification session did not contain an injected EIP-1193 provider. The deployed frontend therefore could not sign a browser transaction in that profile; installing or importing a wallet was intentionally not performed without a specific wallet-extension authorization. The live multi-role contract demonstration was completed with disposable CLI/SDK signers, and the public browser registry/readback was verified separately.
+2. Windows Direct Mode remains unavailable because of the documented `genlayer-test==0.29.2` file-lock cleanup defect; WSL Direct Mode is the counted real-runtime result.
+3. The frontend development dependency audit retains 10 findings whose automatic fixes require breaking major upgrades. Production dependencies have zero reported vulnerabilities under `--omit=dev`.
+
+The complete deployment manifest, transaction ledger, role addresses, source parity results, and Vercel identifiers are in `docs/deployment-manifest.json`.
