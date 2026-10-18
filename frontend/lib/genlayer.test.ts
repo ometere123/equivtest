@@ -20,6 +20,9 @@ describe("GenLayer calldata arguments",()=>{
   expect(executionName({execution_result:"SUCCESS"})).toBe("SUCCESS");
   expect(executionSucceeded({execution_result:"SUCCESS"})).toBe(true);
   expect(executionSucceeded({txExecutionResultName:"FINISHED_WITH_RETURN"})).toBe(true);
+  expect(executionName({consensus_data:{leader_receipt:[{execution_result:"SUCCESS"}]}})).toBe("SUCCESS");
+  expect(executionSucceeded({consensus_data:{leader_receipt:[{execution_result:"SUCCESS"}]}})).toBe(true);
+  expect(executionSucceeded({consensus_data:{leader_receipt:[{execution_result:"ERROR"}]}})).toBe(false);
   expect(executionSucceeded({execution_result:"ERROR"})).toBe(false);
   expect(executionSucceeded({status_name:"FINALIZED"})).toBe(false);
  });

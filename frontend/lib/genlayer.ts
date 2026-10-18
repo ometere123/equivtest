@@ -94,8 +94,13 @@ export async function connectWallet():Promise<string>{
 }
 export function executionName(receipt:unknown){
   if(!receipt||typeof receipt!=="object")return "";
-  const value=receipt as {txExecutionResultName?:unknown;txExecutionResult?:{status?:unknown};executionResult?:unknown;execution_result?:unknown};
-  const name=value.txExecutionResultName??value.txExecutionResult?.status??value.executionResult??value.execution_result;
+  const value=receipt as {
+    txExecutionResultName?:unknown;txExecutionResult?:{status?:unknown};executionResult?:unknown;execution_result?:unknown;
+    consensus_data?:{leader_receipt?:Array<{execution_result?:unknown;executionResult?:unknown}>};
+    consensusData?:{leaderReceipt?:Array<{execution_result?:unknown;executionResult?:unknown}>};
+  };
+  const leader=value.consensus_data?.leader_receipt?.[0]??value.consensusData?.leaderReceipt?.[0];
+  const name=value.txExecutionResultName??value.txExecutionResult?.status??value.executionResult??value.execution_result??leader?.execution_result??leader?.executionResult;
   return typeof name==="string"?name:"";
 }
 export const executionSucceeded=(receipt:unknown)=>["FINISHED_WITH_RETURN","SUCCESS"].includes(executionName(receipt));

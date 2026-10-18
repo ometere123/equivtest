@@ -3,7 +3,7 @@
   "observedAt": "2026-10-18",
   "repository": "https://github.com/ometere123/equivtest",
   "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
-  "verifiedSourceCommit": "PENDING_FINAL_APPLICATION_COMMIT",
+  "verifiedSourceCommit": "aa249b48d99325ea068f754a70c837b7685364d2",
   "finalRepositorySha": "PENDING_FINAL_DOCUMENTATION_COMMIT",
   "verifiedCiRun": "PENDING_FINAL_PUSH_CI",
   "network": {
@@ -122,11 +122,11 @@
   "frontend": {
     "project": "equivtest",
     "productionUrl": "https://equivtest.vercel.app",
-    "deploymentId": "PENDING_FINAL_MANUAL_DEPLOYMENT",
-    "deploymentUrl": "PENDING_FINAL_MANUAL_DEPLOYMENT",
-    "inspectUrl": "PENDING_FINAL_MANUAL_DEPLOYMENT",
-    "status": "PENDING_FINAL_MANUAL_DEPLOYMENT",
-    "sourceCommit": "PENDING_FINAL_APPLICATION_COMMIT",
+    "deploymentId": "dpl_CNNrvfMEAaJ1me9jhrM493aY7MmY",
+    "deploymentUrl": "https://equivtest-94j8snvny-delealufejoel-4184s-projects.vercel.app",
+    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/CNNrvfMEAaJ1me9jhrM493aY7MmY",
+    "status": "READY",
+    "sourceCommit": "aa249b48d99325ea068f754a70c837b7685364d2",
     "manualDeployment": true,
     "automaticGitDeployments": false,
     "publicEnvironment": {
@@ -134,7 +134,8 @@
       "rpc": "https://studio.genlayer.com/api",
       "equivtestAddress": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE"
     },
-    "routes": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"]
+    "routes": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"],
+    "routeCheckResult": "All seven production routes returned HTTP 200 after the final manual deployment."
   },
   "adversarialFindings": [
     {
