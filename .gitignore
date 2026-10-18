@@ -10,6 +10,7 @@ __pycache__/
 .venv/
 *.pyc
 coverage/
+artifacts/
 playwright-report/
 test-results/
 .DS_Store

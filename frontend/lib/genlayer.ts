@@ -92,13 +92,13 @@ export async function connectWallet():Promise<string>{
   await ensureStudioNet(provider);
   return accounts[0];
 }
-function executionName(receipt:unknown){
+export function executionName(receipt:unknown){
   if(!receipt||typeof receipt!=="object")return "";
-  const value=receipt as {txExecutionResultName?:unknown;txExecutionResult?:{status?:unknown};executionResult?:unknown};
-  const name=value.txExecutionResultName??value.txExecutionResult?.status??value.executionResult;
+  const value=receipt as {txExecutionResultName?:unknown;txExecutionResult?:{status?:unknown};executionResult?:unknown;execution_result?:unknown};
+  const name=value.txExecutionResultName??value.txExecutionResult?.status??value.executionResult??value.execution_result;
   return typeof name==="string"?name:"";
 }
-const executionSucceeded=(receipt:unknown)=>executionName(receipt)==="FINISHED_WITH_RETURN";
+export const executionSucceeded=(receipt:unknown)=>["FINISHED_WITH_RETURN","SUCCESS"].includes(executionName(receipt));
 export async function submit(address:string,account:string,method:string,args:unknown[],
   onHash?:(hash:string)=>void):Promise<string>{
   if(!isAddress(address)||!isAddress(account)) throw Error("Missing contract address or wallet.");

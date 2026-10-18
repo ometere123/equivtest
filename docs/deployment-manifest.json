@@ -3,8 +3,9 @@
   "observedAt": "2026-10-18",
   "repository": "https://github.com/ometere123/equivtest",
   "sourceBaseline": "016568ddcccbb92eaa7d88fc85294aa5e66e12f9",
-  "verifiedSourceCommit": "9290af92448947ff5ac9b98e8828aa15f317a178",
-  "verifiedCiRun": "https://github.com/ometere123/equivtest/actions/runs/39070621862",
+  "verifiedSourceCommit": "PENDING_FINAL_APPLICATION_COMMIT",
+  "finalRepositorySha": "PENDING_FINAL_DOCUMENTATION_COMMIT",
+  "verifiedCiRun": "PENDING_FINAL_PUSH_CI",
   "network": {
     "name": "GenLayer StudioNet",
     "chainId": 61999,
@@ -14,132 +15,142 @@
   "toolchain": {
     "genlayerCli": "0.39.1",
     "genvmLinter": "0.11.0",
-    "genvmArtifact": "v0.2.12",
+    "genvmRunner": "v0.2.12",
     "genlayerJs": "1.1.8",
     "genlayerTest": "0.29.2"
   },
   "intendedSources": {
     "contracts/equivtest.py": {
-      "sha256": "FEEC8E28BE125C0FD3F83846935DA4B0DD64C1EBB6475988359A3ABDC11841FC"
+      "sha256": "66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb",
+      "bytes": 27971
     },
-    "contracts/fixture_milestone.py": {
-      "sha256": "10EFE6FD25FD4F19B478A52C33B50CDA1D90D656EC9C0E653BAE9AF4D97D58FB"
+    "contracts/fixture_adversarial.py": {
+      "sha256": "6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41",
+      "bytes": 5378
     },
     "contracts/fixture_consumer.py": {
-      "sha256": "2F3F91636F82C97ED7987A9EFB540A0C9003416CDCFAEF289518EF5BCBAF4CE1"
+      "sha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc7176cd6eb8",
+      "bytes": 2049
+    },
+    "contracts/fixture_milestone.py": {
+      "sha256": "01d416f01b144575df01cd52ecac61c23d5eda72764b6de6e50c24db67853e6b",
+      "bytes": 2168
     }
   },
   "deployments": {
     "equivtest": {
-      "address": "0x647483f23849895d0c7e6c4fAd267d76a6365B5A",
-      "deploymentTx": "0xf8a08f5bf305ff1b063d769549be7327bbd27a6aa136ad0d4f830514ec5d3210",
+      "address": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE",
+      "deploymentTx": "0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742",
       "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-      "explorerTx": "https://explorer-studio.genlayer.com/tx/0xf8a08f5bf305ff1b063d769549be7327bbd27a6aa136ad0d4f830514ec5d3210",
-      "localBytes": 19490,
-      "deployedBytes": 19490,
-      "sourceSha256": "FEEC8E28BE125C0FD3F83846935DA4B0DD64C1EBB6475988359A3ABDC11841FC",
+      "localBytes": 27971,
+      "deployedBytes": 27971,
+      "sourceSha256": "66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb",
       "sourceParity": "EXACT"
     },
-    "fixtureMilestone": {
-      "address": "0xe8A8590B3259A4bFDf06462EaCE4e3d9A6A25B1f",
-      "deploymentTx": "0x6bda6ccb05740235c86f25ccb748ec8f2cd1c4c49d09f203c655a633058523e6",
+    "fixtureAdversarial": {
+      "address": "0xA1144EfB7aFae409210b84e9Cbeb91C2AbC8c145",
+      "deploymentTx": "0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487",
       "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x6bda6ccb05740235c86f25ccb748ec8f2cd1c4c49d09f203c655a633058523e6",
-      "localBytes": 1652,
-      "deployedBytes": 1652,
-      "sourceSha256": "10EFE6FD25FD4F19B478A52C33B50CDA1D90D656EC9C0E653BAE9AF4D97D58FB",
+      "localBytes": 5378,
+      "deployedBytes": 5378,
+      "sourceSha256": "6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41",
       "sourceParity": "EXACT"
     },
     "fixtureConsumer": {
-      "address": "0xa46fB1560e1Ea477c76da269bDD14e6FD5Ae3674",
-      "deploymentTx": "0x03b6a1c950da74126bcb7b81a86b7271d7ea2b58ec1eacf605ee962263917245",
+      "address": "0xaf3f0Bc3289E86B53c1dF96F21b23389E8d19f71",
+      "deploymentTx": "0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca",
       "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x03b6a1c950da74126bcb7b81a86b7271d7ea2b58ec1eacf605ee962263917245",
-      "localBytes": 1077,
-      "deployedBytes": 1077,
-      "sourceSha256": "2F3F91636F82C97ED7987A9EFB540A0C9003416CDCFAEF289518EF5BCBAF4CE1",
+      "localBytes": 2049,
+      "deployedBytes": 2049,
+      "sourceSha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc7176cd6eb8",
+      "sourceParity": "EXACT",
+      "constructorBinding": {
+        "registry": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE",
+        "suiteId": "S-1",
+        "targetId": "T-1"
+      }
+    },
+    "fixtureMilestone": {
+      "address": "0xe54ccca25ae4ACE1D484aF341adEf29C9b5feB10",
+      "deploymentTx": "0x62f217afc0eb0ccec9df86b2c33377cb98f94486cd687467c34d5bfc37954125",
+      "explorerTx": "https://explorer-studio.genlayer.com/tx/0x62f217afc0eb0ccec9df86b2c33377cb98f94486cd687467c34d5bfc37954125",
+      "executionStatus": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+      "localBytes": 2168,
+      "deployedBytes": 2168,
+      "sourceSha256": "01d416f01b144575df01cd52ecac61c23d5eda72764b6de6e50c24db67853e6b",
       "sourceParity": "EXACT"
     }
   },
   "sourceParity": {
-    "method": "GenLayerJS 1.1.8 getContractCode raw-byte comparison",
-    "allContractsExact": true,
-    "result": "Each retrieved byte sequence matched the intended local source byte-for-byte and produced the listed SHA-256."
+    "method": "GenLayerJS 1.1.8 getContractCode raw byte comparison",
+    "artifact": "docs/source-parity-20261018.json",
+    "allExact": true,
+    "verifiedBytes": "Each retrieved deployed byte sequence matched the intended local source byte-for-byte."
   },
   "liveDemonstration": {
-    "wallets": [
-      {"role": "deployer", "label": "praest-deployer", "address": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7"},
-      {"role": "suite-builder", "label": "equivtest-builder", "address": "0xcae3bf2755e18448aa5bb15d632815deb7780f18"},
-      {"role": "tester", "label": "equivtest-tester", "address": "0x8686f3c2434caf7ff9adb5fcacace67b7b987eb7"},
-      {"role": "auditor", "label": "equivtest-auditor", "address": "0x3161ad2ce7e22af8d7e751d97a1cd5205706fda2"},
-      {"role": "consumer", "label": "equivtest-consumer", "address": "0xa35d8b9adbb548c27638e13957f52e4a893d29fd"}
-    ],
-    "target": {
-      "id": "T-1",
-      "address": "0xe8A8590B3259A4bFDf06462EaCE4e3d9A6A25B1f",
-      "duplicateRegistrationTx": "0xce11a7ac20dfec46ee0138d3f7354fd0cc8a2becc1fda43676d6b4224652f5d9",
-      "duplicateRegistrationResult": "Existing T-1 returned; no duplicate target state created."
+    "artifact": "docs/live-demo-20261018.json",
+    "roles": {
+      "deployer": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+      "suiteBuilder": "0xcAE3bF2755E18448aA5Bb15d632815deb7780F18",
+      "auditor": "0x3161ad2Ce7e22AF8D7e751D97a1cd5205706FDA2",
+      "tester": "0x8686F3c2434cAF7Ff9aDB5fCACaCE67B7B987eB7",
+      "consumer": "0xA35d8B9aDBb548C27638e13957F52e4a893d29fd"
     },
-    "suiteS1": {
-      "createTx": "0xd68493a01e6277a723f6c275e2cfc98deccec0932f569d7ac59d0628cc5b627d",
-      "caseTx": "0xb8aed95cf586877976125770461967859489d18d9196affa517fb941bdebe95b",
-      "freezeTx": "0xe88f3ed2a25d92b156fbbbab7dddb4e711ba4d630a99bdc98772b8d6e23f15e7",
-      "digest": "e0122c7372ef6bac3dda666dc2743bb48e91c6a57f14a5f74fe5afd9d66b7f6b"
-    },
-    "suiteS2": {
-      "createTx": "0xf283e5337dcb9e76ec1057982150d560875a82859d05acea5af9528b0d370df7",
-      "caseTx": "0xd173f5e31c5259635318c0528b061e463acd308278e6d3af2c232ef9494a6885",
-      "freezeTx": "0x7c9f74ef4cd7b900663b0be14b9f3ddb0653bde6f64250c012b0324b8530fca0",
-      "digest": "f99a1de429a5f21552b89ecebbacca1c9a2e6d0621fe4da9669011a5425ad189",
-      "purpose": "Ambiguous requirement produces INCONCLUSIVE."
-    },
+    "targetId": "T-1",
+    "suiteId": "S-1",
+    "caseId": "C-1",
+    "suiteDigest": "61b55e8102e96134cfd8798efcf03edbf4beae324361e5cbe1d1db455f7f7b9f",
     "runs": {
-      "R-1": {"outcome": "PASS", "suite": "S-1", "openTx": "0x870a5b083f8e4b2bf07b7720d701c4d0099a5d2446a8dc6e8d4fa75fe6448994", "actionTx": "0x6e73377c1cbb66cea23669ba59426f46c7b2ecd3842e807a453e33772c54f324", "captureTx": "0xb95fe8d38f83cd2206c7c627d90e86b74d32db429fb5cb6787be2aabee9ac83", "evaluateTx": "0x80e1ac0cb1f1229c38b7423a4770714919f65464891ee270017ab6b9d285790a", "closeTx": "0x2a58a499824ea70c83d452b0220de011743f77debd13aea6428dc6ce009f6940"},
-      "R-2": {"outcome": "FAIL", "suite": "S-1", "openTx": "0x7d9ad028e12a18c7da78597a378418ea49c59329c398553af92dbb73f29b1058", "actionTx": "0x11f8858e393ee521388ec9888fd6cceb37a41ace80372c2586b89f49a7603d18", "captureTx": "0x20e2dae4e5f83ff5b05d89a364047f69e66f87535863f113fb826df50fb11396", "evaluateTx": "0x8f047b27d035ee2c40cd3f8ddd6a72e3dcc8969fd07ca2c27b8200eeb7f7fa62", "closeTx": "0xd555a0237e145dc02b339323bd18591f5e8fe1da70fabf065fffda0062ae401e"},
-      "R-3": {"outcome": "INCONCLUSIVE", "suite": "S-2", "openTx": "0x2d2c4c0ef71171e60efc9a0a80882ee70cff9342d9a3a0e203f3288a02d58166", "actionTx": "0x5e56aacb5cee47211e5cf3b1ce072b244d5e6b151ca6d4c7d5aa0e7053c114de", "captureTx": "0x96ae440bf307abf922252bb020d9928032b3ad3a8163a7d895ae9930c797ca83", "evaluateTx": "0x1e3790d7ab376cb8027743aaf3170bc03c206df8581172730e77e743a77fb5a7", "closeTx": "0xc9c43613562aafd353d1b2f1b9b08adc87808e7ce6afef5e001d2f02013e002c"},
-      "R-4": {"outcome": "PASS", "suite": "S-1", "recheckOf": "R-1", "openTx": "0xae72bf16a0b85cbc211983098662c9fe05c389896b30c86a5e92c2758d52fea7", "actionTx": "0x6cde05ca318fd4ac46fab77d43625ced29201beabcc6d6778aa9e6bec4ca567a", "captureTx": "0xd48972d870ad4cd31b4d0d4afe358e539eb5286db4a9c99c23329b01fe18164f", "evaluateTx": "0x7a66001d525e3eb3d5f96bd20ea569dfce9863af07fd685053dbf1e461e7f425", "closeTx": "0x976ef5869b7100023699b0ed1cef66ce15ebb64eac8584f12c047e725fee78cb"}
+      "R-1": {"outcome": "PASS", "certified": true, "evidenceDigest": "c68e1f79cafb5ebf332b0997b9666a1ce52c832cbf63d3aad952b6074202ab6f"},
+      "R-2": {"outcome": "FAIL", "certified": false, "evidenceDigest": "f80e3a8ef680b08aebdff6c5b2b9d83a843aa36ca6352359abb31ff6db898e46"},
+      "R-3": {"outcome": "INCONCLUSIVE", "certified": false, "evidenceDigest": "a588f6e6dbea1bd3061682e9d41b2d52eb5a5a1cdff2416f5cd99e892fc38802"},
+      "R-4": {"outcome": "PASS", "certified": true, "recheckOf": "R-1", "evidenceDigest": "f4c8d66a1c375a9c37cb2363bab585a8398321bc53cd2f0b7c66b93700602b6a"}
     },
     "consumer": {
-      "approveR1Tx": "0xfaf63969982b073c4240ebe35223669996d593ae19f037f5055ee4cd9ec26e3b",
-      "rejectR2Tx": "0x128290b567346d148d8915b579a52c3bc42260152f289ea7c1a806e5f5e81c38",
-      "result": "R-1 approved; R-2 rejected. The rejection transaction finalized but its leader execution was ERROR and is not counted as a successful state mutation."
-    },
-    "readback": {
-      "counts": {"targets": 1, "suites": 2, "cases": 2, "runs": 4},
-      "conformance": {"R-1": true, "R-2": false, "R-3": false, "R-4": true, "R-1-with-S-2": false}
+      "acceptedRun": "R-1",
+      "acceptedTx": "0xf103a2c4b65b3c401c7f321cac3b4f4ffb79a81149e7f4519c39f4f7f84fe526",
+      "rejectedRun": "R-2",
+      "rejectedTx": "0x92fac74718302aa842cdfc8e4550a165ba7e74f2732469f79fcf3a5df13d5cd8",
+      "rejectedExecution": "FINALIZED / MAJORITY_AGREE / ERROR",
+      "acceptedState": "release-gate-pass enabled",
+      "rejectedState": "no successful release-gate-fail mutation"
     }
   },
   "frontend": {
-    "vercelProject": "equivtest",
-    "deploymentId": "dpl_8L76h3tU5C9X488bq8PYkrnt9cvh",
-    "deploymentUrl": "https://equivtest-r4sgh82rn-delealufejoel-4184s-projects.vercel.app",
+    "project": "equivtest",
     "productionUrl": "https://equivtest.vercel.app",
-    "inspectUrl": "https://vercel.com/delealufejoel-4184s-projects/equivtest/8L76h3tU5C9X488bq8PYkrnt9cvh",
-    "status": "READY",
-    "sourceCommit": "9290af92448947ff5ac9b98e8828aa15f317a178",
+    "deploymentId": "PENDING_FINAL_MANUAL_DEPLOYMENT",
+    "deploymentUrl": "PENDING_FINAL_MANUAL_DEPLOYMENT",
+    "inspectUrl": "PENDING_FINAL_MANUAL_DEPLOYMENT",
+    "status": "PENDING_FINAL_MANUAL_DEPLOYMENT",
+    "sourceCommit": "PENDING_FINAL_APPLICATION_COMMIT",
     "manualDeployment": true,
     "automaticGitDeployments": false,
-    "publicEnvironment": {"chainId": 61999, "rpc": "https://studio.genlayer.com/api", "equivtestAddress": "0x647483f23849895d0c7e6c4fAd267d76a6365B5A"},
-    "routeChecks": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"],
-    "routeCheckResult": "All seven production routes returned HTTP 200. The public registry readback displayed R-1 through R-4 and exact R-1/R-4 verification."
+    "publicEnvironment": {
+      "chainId": 61999,
+      "rpc": "https://studio.genlayer.com/api",
+      "equivtestAddress": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE"
+    },
+    "routes": ["/", "/dashboard", "/projects", "/suites", "/runner", "/results", "/registry"]
   },
-  "browserVerification": {
-    "environment": "Chrome with Rabby injected wallet",
-    "account": "0xfcef676044658B5402f590daBe9E04A0F640522f",
-    "network": "StudioNet 61999",
-    "attemptedMethod": "register_target",
-    "transactionHash": "0x91d436ad6ba2b4e735a441ed13c5dcad33b4217701fad1b91ebcc0989fe09f58",
-    "explorerTx": "https://explorer-studio.genlayer.com/tx/0x91d436ad6ba2b4e735a441ed13c5dcad33b4217701fad1b91ebcc0989fe09f58",
-    "executionStatus": "FINALIZED / MAJORITY_AGREE / FINISHED_WITH_ERROR",
-    "error": "TypeError: address expected at gl.get_contract_at(target_address)",
-    "stateMutation": "none; counts remained targets=1, suites=2, cases=2, runs=4",
-    "rootCause": "The deployed frontend passed a JavaScript string where GenLayerJS 1.1.8 requires CalldataAddress for a Python Address parameter.",
-    "sourceFix": "frontend/lib/genlayer.ts now recursively encodes valid address arguments as CalldataAddress and treats known terminal execution errors as non-pending.",
-    "productionRedeploy": "not performed; the requested single manual Vercel deployment was already used"
-  },
+  "adversarialFindings": [
+    {
+      "finding": "Older consumer deployment failed in GenVM because two differently typed TreeMaps were serialized under one contract state.",
+      "resolution": "Replaced them with one typed records map; added Direct Mode constructor/storage regression coverage; final consumer deployment is successful.",
+      "notFinalEvidence": true
+    },
+    {
+      "finding": "Earlier browser build encoded Python Address arguments as plain strings.",
+      "resolution": "Recursive CalldataAddress encoding, authoritative SUCCESS/FINISHED_WITH_RETURN checks, and readback gating were added before the final manual frontend deployment.",
+      "notFinalEvidence": false
+    }
+  ],
   "limitations": [
-    "The corrected browser calldata path is committed and passes local checks, but the single existing Vercel deployment predates the fix. A second Vercel deployment would be required to make the corrected write path live at https://equivtest.vercel.app.",
-    "The Windows Direct Mode harness is not counted as evidence because genlayer-test 0.29.2 hits a Windows file-lock PermissionError during loader cleanup; the same six Direct Mode tests pass under WSL.",
-    "The full frontend development audit reports 10 dev-only vulnerabilities (3 moderate, 5 high, 2 critical); npm audit reports zero production vulnerabilities. Automatic fixes require breaking Vitest 5 and Tailwind 4 upgrades and were not applied to the locked StudioNet-compatible release."
+    "GenLayer consensus remains dependent on the configured leader/validator/model execution.",
+    "A target public adapter is not an oracle for external reality.",
+    "Frontend development dependencies retain 10 audit findings whose automatic fixes require breaking Vitest 5 and Tailwind 4 upgrades; production dependencies report zero vulnerabilities."
   ]
 }

@@ -5,6 +5,8 @@ pinned GenVM runner. It does not claim StudioNet network evidence; that is
 captured by the integration evidence ledger.
 """
 import json
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -144,6 +146,16 @@ def test_direct_deploy_and_freeze_lifecycle(direct_vm, direct_deploy, direct_ali
     with direct_vm.expect_revert("Suite frozen"):
         direct_vm.sender = REQUIREMENT_AUTHOR
         contract.add_case(suite_id, "Late", "No", "No", "LOW")
+
+
+def test_direct_consumer_constructor_and_record_storage(direct_deploy, direct_alice):
+    sdk_root = next(Path.home().glob(".cache/gltest-direct/extracted/v0.2.12/**/genlayer"))
+    sys.path.insert(0, str(sdk_root.parent))
+    from genlayer.py.types import Address
+    consumer = direct_deploy(
+        "contracts/fixture_consumer.py", Address(direct_alice), "S-1", "T-1", sdk_version=SDK_VERSION
+    )
+    assert consumer.get_integration("missing") == ""
 
 
 def test_direct_authorization_and_run_guards(direct_vm, direct_deploy, direct_alice, direct_bob):

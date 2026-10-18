@@ -1,6 +1,6 @@
 import {describe,it,expect} from "vitest";
 import {CalldataAddress} from "genlayer-js/types";
-import {toCalldataArgs} from "./genlayer";
+import {executionName,executionSucceeded,toCalldataArgs} from "./genlayer";
 
 describe("GenLayer calldata arguments",()=>{
  it("encodes address strings as GenLayer calldata addresses",()=>{
@@ -15,5 +15,12 @@ describe("GenLayer calldata arguments",()=>{
   expect(value).toBeInstanceOf(Array);
   expect((value as unknown[])[0]).toBe("case-1");
   expect((value as unknown[])[1]).toMatchObject({target:expect.any(CalldataAddress)});
+ });
+ it("accepts StudioNet SUCCESS and rejects error or unknown final receipts",()=>{
+  expect(executionName({execution_result:"SUCCESS"})).toBe("SUCCESS");
+  expect(executionSucceeded({execution_result:"SUCCESS"})).toBe(true);
+  expect(executionSucceeded({txExecutionResultName:"FINISHED_WITH_RETURN"})).toBe(true);
+  expect(executionSucceeded({execution_result:"ERROR"})).toBe(false);
+  expect(executionSucceeded({status_name:"FINALIZED"})).toBe(false);
  });
 });

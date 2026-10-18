@@ -1,0 +1,56 @@
+{
+  "network": {
+    "name": "StudioNet",
+    "chain_id": 61999,
+    "rpc": "https://studio.genlayer.com/api",
+    "sdk": "genlayer-js@1.1.8"
+  },
+  "retrieved_at": "2026-10-18T10:21:57.909Z",
+  "deployments": [
+    {
+      "name": "equivtest",
+      "address": "0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE",
+      "source": "contracts/equivtest.py",
+      "deployment_tx": "0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742",
+      "local_bytes": 27971,
+      "deployed_bytes": 27971,
+      "local_sha256": "66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb",
+      "deployed_sha256": "66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb",
+      "exact_byte_parity": true
+    },
+    {
+      "name": "fixture_adversarial",
+      "address": "0xA1144EfB7aFae409210b84e9Cbeb91C2AbC8c145",
+      "source": "contracts/fixture_adversarial.py",
+      "deployment_tx": "0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487",
+      "local_bytes": 5378,
+      "deployed_bytes": 5378,
+      "local_sha256": "6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41",
+      "deployed_sha256": "6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41",
+      "exact_byte_parity": true
+    },
+    {
+      "name": "fixture_consumer",
+      "address": "0xaf3f0Bc3289E86B53c1dF96F21b23389E8d19f71",
+      "source": "contracts/fixture_consumer.py",
+      "deployment_tx": "0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca",
+      "local_bytes": 2049,
+      "deployed_bytes": 2049,
+      "local_sha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc71c76cd6eb8",
+      "deployed_sha256": "d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc71c76cd6eb8",
+      "exact_byte_parity": true
+    },
+    {
+      "name": "fixture_milestone",
+      "address": "0xe54ccca25ae4ACE1D484aF341adEf29C9b5feB10",
+      "source": "contracts/fixture_milestone.py",
+      "deployment_tx": "0x62f217afc0eb0ccec9df86b2c33377cb98f94486cd687467c34d5bfc37954125",
+      "local_bytes": 2168,
+      "deployed_bytes": 2168,
+      "local_sha256": "01d416f01b144575df01cd52ecac61c23d5eda72764b6de6e50c24db67853e6b",
+      "deployed_sha256": "01d416f01b144575df01cd52ecac61c23d5eda72764b6de6e50c24db67853e6b",
+      "exact_byte_parity": true
+    }
+  ],
+  "all_exact": true
+}

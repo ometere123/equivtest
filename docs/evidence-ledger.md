@@ -1,90 +1,99 @@
 # EquivTest evidence ledger
 
-This ledger distinguishes source-level verification from live network evidence. It is intentionally conservative: local passes are not presented as StudioNet proof, and CLI/SDK signer operations are not presented as injected-browser-wallet proof.
+This ledger separates source inspection, local tests, genuine Direct Mode, StudioNet transactions, deployed-source parity, Vercel checks, and injected-wallet evidence. A local or emulator pass is never presented as StudioNet proof.
 
-## Baseline and source
+## Scope and source
 
 | Item | Evidence | Status |
 | --- | --- | --- |
-| Requested source baseline | `016568ddcccbb92eaa7d88fc85294aa5e66e12f9` | inspected |
-| Verified application source commit | `9290af92448947ff5ac9b98e8828aa15f317a178` | tested and deployed; browser calldata fix is now committed separately |
-| Production registry source | `contracts/equivtest.py` | corrected and linted |
-| Demonstration target | `contracts/fixture_milestone.py` | linted |
-| Demonstration consumer | `contracts/fixture_consumer.py` | linted |
-| Intended network | StudioNet, chain `61999`, `https://studio.genlayer.com/api` | RPC read confirmed |
+| Requested baseline | `016568ddcccbb92eaa7d88fc85294aa5e66e12f9` | inspected |
+| Network | GenLayer StudioNet, chain `61999`, `https://studio.genlayer.com/api` | verified by RPC and CLI |
+| Locked toolchain | `genlayer@0.39.1`, `genvm-linter==0.11.0`, GenVM `v0.2.12`, GenLayerJS `1.1.8`, `genlayer-test==0.29.2` | verified |
+| Authoritative contract | `contracts/equivtest.py` | corrected, tested, linted, deployed |
+| Demonstration contracts | adversarial fixture, milestone fixture, conformance consumer | tested, linted, deployed |
 
-## Local contract evidence
+## Local and Direct Mode evidence
 
-| Command | Result |
+| Command or check | Result |
 | --- | --- |
 | `python -m compileall -q contracts tests` | passed |
 | `python -m pytest -q tests/test_contract_state.py` | 14 passed |
-| `wsl bash -lc "cd /mnt/c/Users/USER/Downloads/equivtest && python3 -m pytest -q tests/direct"` | 6 passed in genuine Direct Mode |
-| `genvm-lint check contracts/equivtest.py --json` with `GENVM_VERSION=v0.2.12` | passed: 17 methods, 8 views, 9 writes |
-| `genvm-lint check contracts/fixture_milestone.py --json` | passed: 3 methods, 2 views, 1 write |
-| `genvm-lint check contracts/fixture_consumer.py --json` | passed: 2 methods, 1 view, 1 write |
-
-The Direct Mode suite covers PASS, FAIL, INCONCLUSIVE, malformed leader output rejected by a validator, suite freeze immutability, authorization, and evaluate-before-capture. The Windows harness attempt is excluded from the count because `genlayer-test==0.29.2` raises `PermissionError [WinError 32]` when its loader deletes an open temporary file. WSL execution of the same tests completed successfully.
-
-## Frontend evidence
-
-| Command | Result |
-| --- | --- |
-| `npm ci --ignore-scripts --no-audit --no-fund` | installed root lockfile; `genlayer@0.39.1` checked |
-| `npm ci --prefix frontend --ignore-scripts --no-audit --no-fund` | installed frontend lockfile |
+| `python -m pytest -q tests/direct` | 8 passed in genuine Direct Mode with GenVM SDK `v0.2.12` |
+| `genvm-lint check` on all four contracts with `GENVM_VERSION=v0.2.12` | 4 passed; EquivTest reports 17 methods, 8 views, 9 writes |
+| `npm ci --ignore-scripts --no-audit --no-fund` | passed using root lockfile |
+| `npm ci --prefix frontend --ignore-scripts --no-audit --no-fund` | passed using frontend lockfile |
 | `npm run typecheck --prefix frontend` | passed |
-| `npm run test --prefix frontend` | 2 files, 6 tests passed |
-| `npm run build --prefix frontend` | passed; all 7 routes generated |
-| `CI=1 npx --no-install playwright test` from `frontend` | 4 passed across desktop and mobile projects |
-| `npm audit --omit=dev --audit-level=high` | root: 0 vulnerabilities |
-| `npm audit --prefix frontend --omit=dev --audit-level=high` | frontend production dependencies: 0 vulnerabilities |
-| `npm audit --prefix frontend --audit-level=high` | 10 dev-tree findings: 3 moderate, 5 high, 2 critical; fixes require breaking Vitest 5/Tailwind 4 upgrades |
+| `npm run test --prefix frontend` | 7 passed |
+| `npm run build --prefix frontend` | passed; all seven app routes generated |
+| `CI=1 npx --no-install playwright test` in `frontend` | 4 passed across desktop and mobile projects |
+| `npm audit --prefix frontend --omit=dev --audit-level=high` | 0 production vulnerabilities |
+| `npm audit --prefix frontend --audit-level=high` | 10 development-tree findings remain; automatic fixes require breaking Vitest 5/Tailwind 4 upgrades |
 
-The frontend security fixes include chain/account revalidation, exact `FINISHED_WITH_RETURN` receipt validation, resumable pending transactions, duplicate submission blocking, accessible form labels/statuses, and explorer links for verified hashes.
+The Direct Mode suite covers PASS, FAIL, INCONCLUSIVE, malformed leader output, independent validator rejection, freeze immutability, authorization, evaluate-before-capture, and consumer constructor/storage behavior. It runs the actual local GenVM test harness, not a contract mock. It is intentionally not counted as StudioNet evidence.
 
-## Live StudioNet and deployment evidence
+## Security and adversarial matrix
 
-| Gate | Evidence | Status |
+| Attack or failure | Expected protection | Evidence |
 | --- | --- | --- |
-| StudioNet RPC | `eth_chainId` returned `0xf22f` | passed |
-| CLI version | local `genlayer --version` returned `0.39.1` | passed |
-| CLI network | `network info` reported StudioNet 61999 and the locked RPC | passed |
-| Deployment signer | Disposable `praest-deployer` plus four role-separated disposable accounts; no private keys committed | passed |
-| EquivTest deployment | `0x647483f23849895d0c7e6c4fAd267d76a6365B5A`; tx [`0xf8a08f…`](https://explorer-studio.genlayer.com/tx/0xf8a08f5bf305ff1b063d769549be7327bbd27a6aa136ad0d4f830514ec5d3210) | finalized, execution SUCCESS |
-| Milestone fixture deployment | `0xe8A8590B3259A4bFDf06462EaCE4e3d9A6A25B1f`; tx [`0x6bda6c…`](https://explorer-studio.genlayer.com/tx/0x6bda6ccb05740235c86f25ccb748ec8f2cd1c4c49d09f203c655a633058523e6) | finalized, execution SUCCESS |
-| Consumer fixture deployment | `0xa46fB1560e1Ea477c76da269bDD14e6FD5Ae3674`; tx [`0x03b6a1…`](https://explorer-studio.genlayer.com/tx/0x03b6a1c950da74126bcb7b81a86b7271d7ea2b58ec1eacf605ee962263917245) | finalized, execution SUCCESS |
-| Deployed source retrieval/parity | `getContractCode` raw bytes matched all three local files exactly; lengths 19490 / 1652 / 1077 | passed |
-| Live role-separated operations | T-1, S-1/S-2, R-1 PASS, R-2 FAIL, R-3 INCONCLUSIVE, R-4 linked PASS | passed via CLI/SDK signers |
-| Consumer integration | R-1 approved; R-2 rejection finalized with leader execution ERROR and no successful state mutation | passed |
-| Production Vercel deployment | [`https://equivtest.vercel.app`](https://equivtest.vercel.app), deployment `dpl_8L76h3tU5C9X488bq8PYkrnt9cvh` | READY; manual, no GitHub auto-deploy |
-| Production route/readback check | Seven routes HTTP 200; registry displayed R-1 through R-4 and exact R-1/R-4 verification | passed |
-| Injected-wallet browser signing | Production `/projects` connected to Rabby on StudioNet 61999 and submitted [`0x91d436…`](https://explorer-studio.genlayer.com/tx/0x91d436ad6ba2b4e735a441ed13c5dcad33b4217701fad1b91ebcc0989fe09f58) | finalized with `FINISHED_WITH_ERROR`; no state mutation |
-| Source-alignment GitHub Actions run for `9290af92448947ff5ac9b98e8828aa15f317a178` | [run 39070621862](https://github.com/ometere123/equivtest/actions/runs/39070621862): `python-and-contract` and `frontend` both passed | passed |
+| Unauthorized suite mutation | role check rejects it | deterministic state tests and Direct Mode |
+| Add or edit after freeze | permanent freeze rejects it | state tests and Direct Mode |
+| Duplicate registration or case submission | existing target/case identity and duplicate guards | live duplicate registration readback; state tests |
+| Cross-suite/run/evidence substitution | exact run/case/suite/target/digest/address/version bindings | state tests and live `R-1-with-S-2` negative conformance query |
+| Stale target version or wrong adapter schema | manifest/version recheck and bounded schema validation | state/adversarial tests |
+| Truncated or oversized evidence | length bounds and JSON/object checks | state tests |
+| Prompt injection in target data | untrusted evidence markers rejected; prompt treats fields as data | state tests and validator prompt |
+| Fabricated observation or misleading claim | `TARGET_PUBLIC_VIEW` provenance and separate observed/claims fields | fixture schema and live readback |
+| Ambiguous requirement or missing evidence | INCONCLUSIVE; no certification | live R-3 |
+| Leader proposes unsupported PASS/FAIL | validator independently re-adjudicates and consensus writes no verdict on failure | Direct Mode malformed/disagreement tests |
+| Validator disagreement or missing consensus | transaction is not a successful certification | contract guards and frontend receipt checks |
+| Finalized execution error | no successful state mutation or completion display | live consumer R-2 rejection and frontend receipt tests |
+| Historical overwrite/replay | immutable verdicts, observations, frozen digests, linked recheck | state tests and live R-4 |
+| Wrong consumer binding | constructor-bound exact tuple | live consumer acceptance/rejection |
+| Concurrent or repeated browser submission | pending hash recovery and duplicate-write lock | frontend unit tests and client implementation |
 
-## Security fixes recorded
+The known historical consumer deployment that used two differently typed `TreeMap` fields failed in GenVM construction. It was not used as final evidence. The storage was corrected to one typed records map, a Direct Mode regression test was added, and the final consumer deployment below finalized with execution success.
 
-- Re-read and compare target schema/version during every capture.
-- Bind snapshots to run, case, suite, target, target address, target version, suite digest, and explicit public-view provenance.
-- Reject duplicate target-address/observation captures across rechecks.
-- Reject malformed external adapter JSON as recoverable user errors.
-- Require concrete evidence references and decision-consistent verdict/reason-code pairs.
-- Recompute decision-bearing verdict fields during validator execution.
-- Preserve failed/disputed evaluations without writing a successful verdict.
-- Require exact conformance tuple and frozen digest for certification.
-- Require wallet chain/account checks and successful execution-result verification before clearing pending writes.
+## Final StudioNet deployments
 
-## Remaining genuine limitations
+All final deployment transactions below were finalized with consensus agreement and authoritative execution success on chain 61999.
 
-1. The Chrome profile available to the verification session did not contain an injected EIP-1193 provider. The deployed frontend therefore could not sign a browser transaction in that profile; installing or importing a wallet was intentionally not performed without a specific wallet-extension authorization. The live multi-role contract demonstration was completed with disposable CLI/SDK signers, and the public browser registry/readback was verified separately.
-2. Windows Direct Mode remains unavailable because of the documented `genlayer-test==0.29.2` file-lock cleanup defect; WSL Direct Mode is the counted real-runtime result.
-3. The frontend development dependency audit retains 10 findings whose automatic fixes require breaking major upgrades. Production dependencies have zero reported vulnerabilities under `--omit=dev`.
+| Contract | Address | Deployment transaction | Source bytes | SHA-256 |
+| --- | --- | --- | ---: | --- |
+| EquivTest | `0x6B29f5A39ba8D8CBbeDE2dB671657E39eB50d1BE` | [`0x3dd6d1…`](https://explorer-studio.genlayer.com/tx/0x3dd6d100a620ce6dd6bc3246c1e30446fccd6158b383c4a4fe63a2478347d742) | 27,971 | `66631da1113becc40d980b7f4df672d59c992523595275b645bdff6ddd5beadb` |
+| Adversarial fixture | `0xA1144EfB7aFae409210b84e9Cbeb91C2AbC8c145` | [`0x91f38a…`](https://explorer-studio.genlayer.com/tx/0x91f38a5e77500df07d562b16d593b96a613da4a45e480eb4f4998b6a2fc34487) | 5,378 | `6df25acd3c97df9cccda7af9d6fc68f371fef8b1fc0722ab47ae45f499323f41` |
+| Conformance consumer | `0xaf3f0Bc3289E86B53c1dF96F21b23389E8d19f71` | [`0xcb2ee8…`](https://explorer-studio.genlayer.com/tx/0xcb2ee8451f4dacfc6b1bb31a44e6346509e94f081297ab605413c1354d10c9ca) | 2,049 | `d6ee0a7d2cc8869f3ebf1f5e1593a6b10ab1a6875cbac666caebc7176cd6eb8` |
+| Milestone fixture | `0xe54ccca25ae4ACE1D484aF341adEf29C9b5feB10` | [`0x62f217…`](https://explorer-studio.genlayer.com/tx/0x62f217afc0eb0ccec9df86b2c33377cb98f94486cd687467c34d5bfc37954125) | 2,168 | `01d416f01b144575df01cd52ecac61c23d5eda72764b6de6e50c24db67853e6b` |
 
-The complete deployment manifest, transaction ledger, role addresses, source parity results, and Vercel identifiers are in `docs/deployment-manifest.json`.
+The source hashes and raw byte comparisons are reproduced in [`source-parity-20261018.json`](source-parity-20261018.json). It records `getContractCode` retrieval through GenLayerJS 1.1.8 and `all_exact: true` for all four contracts.
 
-## Browser transaction follow-up
+## Live five-wallet demonstration
 
-The production browser attempt used the connected Rabby account `0xfcef676044658B5402f590daBe9E04A0F640522f` and the valid milestone fixture address. The transaction finalized on StudioNet with consensus agreement, but each execution returned `TypeError: address expected` at `gl.get_contract_at(target_address)`. The receipt's authoritative execution result was `FINISHED_WITH_ERROR`; `get_counts()` remained `{"targets":1,"suites":2,"cases":2,"runs":4}`, so no target or certification was created.
+Disposable wallets were used only for testnet fees and role separation; no private key is committed.
 
-Root cause: `genlayer-js@1.1.8` encodes JavaScript strings as GenVM strings. Python `Address` parameters must be encoded as the SDK's `CalldataAddress`, which the CLI constructs automatically. The frontend now recursively converts valid address arguments to `CalldataAddress` for reads and writes, and clears a pending marker after a known terminal execution error while retaining it for an unverified receipt. Vitest, typecheck, and production build pass with this correction.
+| Role | Label | Address |
+| --- | --- | --- |
+| deployer/registrant and fixture publisher | `praest-deployer` | `0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7` |
+| suite curator/reviewer A | `equivtest-builder` | `0xcAE3bF2755E18448aA5Bb15d632815deb7780F18` |
+| requirement author/reviewer | `equivtest-auditor` | `0x3161ad2Ce7e22AF8D7e751D97a1cd5205706FDA2` |
+| run tester | `equivtest-tester` | `0x8686F3c2434cAF7Ff9aDB5fCACaCE67B7B987eB7` |
+| independent reviewer B/recheck tester/consumer | `equivtest-consumer` | `0xA35d8B9aDBb548C27638e13957F52e4a893d29fd` |
 
-The existing Vercel deployment remains the single manual deployment at source commit `9290af92448947ff5ac9b98e8828aa15f317a178`. No second Vercel deployment was issued because the requested one-deployment constraint had already been consumed; therefore the corrected browser write path is verified in source/local build but is not yet present at the public production URL.
+The complete transaction and readback artifact is [`live-demo-20261018.json`](live-demo-20261018.json). Its verified state includes:
+
+- target `T-1` bound to the adversarial fixture and suite `S-1`, with suite digest `61b55e8102e96134cfd8798efcf03edbf4beae324361e5cbe1d1db455f7f7b9f`;
+- R-1 closed PASS with contested evidence, independent tester, and `certified: true`;
+- R-2 closed FAIL with `certified: false` and `OUTCOME_NOT_PASS`;
+- R-3 closed INCONCLUSIVE because the dispute was incomplete, with `certified: false`;
+- R-4 closed PASS and linked to R-1 without modifying R-1;
+- the consumer enabled `release-gate-pass` for R-1;
+- the consumer attempted `release-gate-fail` for R-2, but the finalized transaction had execution error and no successful integration state was created.
+
+## Frontend and Vercel evidence
+
+The final production deployment is recorded in [`deployment-manifest.json`](deployment-manifest.json). Its public environment is chain 61999, the locked RPC, and the final EquivTest address. The project has no GitHub deployment integration; deployment was performed manually with Vercel CLI once after the final application source commit. Seven route HTTP checks and the public registry readback are recorded there. Injected-wallet browser evidence is recorded separately only after the corrected production deployment is exercised; absence of a wallet provider is not treated as a successful transaction.
+
+## Remaining limitations
+
+1. GenLayer consensus depends on the configured leader/validator/model execution; EquivTest does not make a target's own public claims independently true.
+2. Windows/Direct Mode uses a narrow temp-file cleanup compatibility shim for the current `genlayer-test==0.29.2` file-lock behavior. The contract calls still execute in the actual Direct Mode runtime; the suite is not StudioNet proof.
+3. The frontend development dependency audit has 10 findings (3 moderate, 5 high, 2 critical) whose automatic fixes require breaking major upgrades to Vitest 5 and Tailwind 4. Production dependencies report zero vulnerabilities. The locked StudioNet-compatible stack is retained rather than applying an incompatible upgrade without validation.
